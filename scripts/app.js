@@ -5,9 +5,15 @@
     data = d3.range(33).map(next); // starting dataset
 
   function next() {
+    time++;
+    value = value + 10 * (Math.random() - .5);
+    value = Math.min(90, value);
+    value = Math.max(10, value);
+    value = Math.floor(value);
+
     return {
-      time: ++time,
-      value: value = ~~Math.max(10, Math.min(90, value + 10 * (Math.random() - .5)))
+      time: time,
+      value: value
     };
   }
 
