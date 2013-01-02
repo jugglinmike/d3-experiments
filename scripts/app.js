@@ -1,6 +1,7 @@
 (function(window, undefined) {
 
   var defaultOpts = {
+    container: "body",
     time: 1297110663, // seconds since epoch
     value: 70,
     width: 20,
@@ -30,7 +31,7 @@
       .domain([0, 100])
       .rangeRound([0, this._options.height]);
 
-    this.chart = d3.select("body").append("svg")
+    this.chart = d3.select(this._options.container).append("svg")
       .attr("class", "chart")
       .attr("width", this._options.width * this.data.length - 1)
       .attr("height", this._options.height);
@@ -48,7 +49,6 @@
     this._options.value = value;
 
     this._options.time++;
-
 
     return {
       time: this._options.time,
@@ -88,7 +88,8 @@
   document.addEventListener( "DOMContentLoaded", function() {
 
     var myChart = new window.BarChart({
-      height: 75
+      height: 75,
+      container: "body"
     });
 
     myChart.draw();
