@@ -38,6 +38,38 @@
 
   };
 
+  // width
+  // If specified, re-set the width of the chart (and return a reference to
+  // the chart itself for chaining). Otherwise, simply return the current
+  // width of the chart
+  BC.prototype.width = function(width) {
+    // The method is being invoked as a getter
+    if (!arguments.length) {
+      return this._options.width;
+    }
+
+    // The method is being invoked as a setter
+    this.chart.attr("width", width);
+    this._options.width = width;
+    return this;
+  };
+
+  // height
+  // If specified, re-set the height of the chart (and return a reference to
+  // the chart itself for chaining). Otherwise, simply return the current
+  // height of the chart
+  BC.prototype.height = function(height) {
+    // The method is being invoked as a getter
+    if (!arguments.length) {
+      return this._options.height;
+    }
+
+    // The method is being invoked as a setter
+    this.chart.attr("height", height);
+    this._options.height = height;
+    return this;
+  };
+
   BC.prototype.next = function() {
 
     // Alias reference for convenience
