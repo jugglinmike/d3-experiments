@@ -1,74 +1,83 @@
 (function(window, undefined) {
-  var chart,
-    time = 1297110663, // start time (seconds since epoch)
-    value = 70, // start value (subscribers)
-    data = d3.range(33).map(next); // starting dataset
 
-  function next() {
-    time++;
-    value = value + 10 * (Math.random() - .5);
-    value = Math.min(90, value);
-    value = Math.max(10, value);
-    value = Math.floor(value);
+  var BC = window.BarChart = function() {
+
+    this.time = 1297110663; // start time (seconds since epoch)
+    this.value = 70; // start value (subscribers)
+    var self = this;
+    // starting dataset
+    this.data = d3.range(33).map(function() {
+      return self.next();
+    });
+    this.width = 20;
+    this.height = 80;
+
+    this.x = d3.scale.linear()
+      .domain([0, 1])
+      .range([0, this.width]);
+
+    this.y = d3.scale.linear()
+      .domain([0, 100])
+      .rangeRound([0, this.height]);
+
+    this.chart = d3.select("body").append("svg")
+      .attr("class", "chart")
+      .attr("width", this.width * this.data.length - 1)
+      .attr("height", this.height);
+
+  };
+
+  BC.prototype.next = function() {
+    this.time++;
+    this.value = this.value + 10 * (Math.random() - .5);
+    this.value = Math.min(90, this.value);
+    this.value = Math.max(10, this.value);
+    this.value = Math.floor(this.value);
 
     return {
-      time: time,
-      value: value
+      time: this.time,
+      value: this.value
     };
   }
 
-  var width = 20,
-    height = 80;
+  BC.prototype.draw = function() {
 
-  var x = d3.scale.linear()
-    .domain([0, 1])
-    .range([0, width]);
-
-  var y = d3.scale.linear()
-    .domain([0, 100])
-    .rangeRound([0, height]);
-
-  var chart = d3.select("body").append("svg")
-    .attr("class", "chart")
-    .attr("width", width * data.length - 1)
-    .attr("height", height);
-
-  function redraw() {
-
-    var rect = chart.selectAll("rect")
-      .data(data, function(d) { return d.time; });
+    var self = this;
+    var rect = this.chart.selectAll("rect")
+      .data(this.data, function(d) { return d.time; });
 
     rect.enter().insert("rect", "line")
-        .attr("x", function(d, i) { return x(i + 1) - .5; })
-        .attr("y", function(d) { return height - y(d.value) - .5; })
-        .attr("width", width)
-        .attr("height", function(d) { return y(d.value); })
+        .attr("x", function(d, i) { return self.x(i + 1) - .5; })
+        .attr("y", function(d) { return self.height - self.y(d.value) - .5; })
+        .attr("width", this.width)
+        .attr("height", function(d) { return self.y(d.value); })
       .transition()
         .duration(1000)
-        .attr("x", function(d, i) { return x(i) - .5; });
+        .attr("x", function(d, i) { return self.x(i) - .5; });
 
     rect.transition()
         .duration(1000)
-        .attr("x", function(d, i) { return x(i) - .5; });
+        .attr("x", function(d, i) { return self.x(i) - .5; });
 
     rect.exit().transition()
         .duration(1000)
-        .attr("x", function(d, i) { return x(i - 1) - .5; })
+        .attr("x", function(d, i) { return self.x(i - 1) - .5; })
         .remove();
   }
 
+}(this));
+
+(function(window, undefined) {
+
   document.addEventListener( "DOMContentLoaded", function() {
 
-    chart = d3.select("body").append("svg")
-        .attr("class", "chart")
-        .attr("width", width * data.length - 1)
-        .attr("height", height);
+    var myChart = new window.BarChart();
 
-    redraw();
+    myChart.draw();
     setInterval(function() {
-      data.shift();
-      data.push(next());
-      redraw();
+      myChart.data.shift();
+      myChart.data.push(myChart.next());
+      myChart.draw();
     }, 1500);
   }, false);
 
