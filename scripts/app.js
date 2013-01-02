@@ -1,9 +1,8 @@
 (function(window, undefined) {
 
   var defaultOpts = {
+    data: [],
     container: "body",
-    time: 1297110663, // seconds since epoch
-    value: 70,
     width: 20,
     height: 80
   };
@@ -18,11 +17,6 @@
     // default values when unspecified
     this._options = _.defaults(options, defaultOpts);
 
-    // starting dataset
-    this.data = d3.range(33).map(function() {
-      return self.next();
-    });
-
     this.x = d3.scale.linear()
       .domain([0, 1])
       .range([0, this._options.width]);
@@ -33,7 +27,7 @@
 
     this.chart = d3.select(this._options.container).append("svg")
       .attr("class", "chart")
-      .attr("width", this._options.width * this.data.length - 1)
+      .attr("width", this._options.width * this._options.data.length - 1)
       .attr("height", this._options.height);
 
   };
@@ -70,29 +64,11 @@
     return this;
   };
 
-  BC.prototype.next = function() {
-
-    // Alias reference for convenience
-    var value = this._options.value;
-    value = value + 10 * (Math.random() - .5);
-    value = Math.min(90, value);
-    value = Math.max(10, value);
-    value = Math.floor(value);
-    this._options.value = value;
-
-    this._options.time++;
-
-    return {
-      time: this._options.time,
-      value: this._options.value
-    };
-  }
-
   BC.prototype.draw = function() {
 
     var self = this;
     var rect = this.chart.selectAll("rect")
-      .data(this.data, function(d) { return d.time; });
+      .data(this._options.data, function(d) { return d.time; });
 
     rect.enter().insert("rect", "line")
         .attr("x", function(d, i) { return self.x(i + 1) - .5; })
@@ -117,17 +93,43 @@
 
 (function(window, undefined) {
 
+  var dataSrc = {
+    time: 1297110663, // seconds since epoch
+    value: 70,
+    next: function() {
+
+      dataSrc.value = dataSrc.value + 10 * (Math.random() - .5);
+      dataSrc.value = Math.min(90, dataSrc.value);
+      dataSrc.value = Math.max(10, dataSrc.value);
+      dataSrc.value = Math.floor(dataSrc.value);
+
+      dataSrc.time++;
+
+      return {
+        time: dataSrc.time,
+        value: dataSrc.value
+      };
+    }
+  };
+
+  var data = d3.range(33).map(function() {
+    return dataSrc.next();
+  });
+
   document.addEventListener( "DOMContentLoaded", function() {
 
     var myChart = new window.BarChart({
       height: 75,
+      data: data,
       container: "body"
     });
 
     myChart.draw();
     setInterval(function() {
-      myChart.data.shift();
-      myChart.data.push(myChart.next());
+
+      data.shift();
+      data.push(dataSrc.next());
+
       myChart.draw();
     }, 1500);
   }, false);
