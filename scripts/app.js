@@ -67,7 +67,7 @@
   BC.prototype.onEnter = function(entering) {
     var self = this;
 
-    entering.insert("rect", "line")
+    entering
       .attr("x", function(d, i) { return self.x(i + 1) - .5; })
       .attr("y", function(d) { return self._options.height - self.y(d.value) - .5; })
       .attr("width", this._options.width)
@@ -94,13 +94,22 @@
         .remove();
   };
 
+  // _insert
+  // Generate a new element for entering data. This method should not be
+  // invoked directly nor overiddent, but it is defined to promote readability.
+  BC.prototype._insert = function(entering) {
+    return entering
+      .insert("rect")
+      .classed("bar-chart-bar", true);
+  };
+
   BC.prototype.draw = function() {
 
     var self = this;
-    var rect = this.chart.selectAll("rect")
+    var rect = this.chart.selectAll("rect.bar-chart-bar")
       .data(this._options.data, function(d) { return d.time; });
 
-    this.onEnter(rect.enter());
+    this.onEnter(this._insert(rect.enter()));
     this.onUpdate(rect);
     this.onExit(rect.exit());
   }
