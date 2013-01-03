@@ -64,29 +64,45 @@
     return this;
   };
 
+  BC.prototype.onEnter = function(entering) {
+    var self = this;
+
+    entering.insert("rect", "line")
+      .attr("x", function(d, i) { return self.x(i + 1) - .5; })
+      .attr("y", function(d) { return self._options.height - self.y(d.value) - .5; })
+      .attr("width", this._options.width)
+      .attr("height", function(d) { return self.y(d.value); })
+      .transition()
+        .duration(1000)
+        .attr("x", function(d, i) { return self.x(i) - .5; });
+  };
+
+  BC.prototype.onUpdate = function(updating) {
+    var self = this;
+
+    updating.transition()
+      .duration(1000)
+      .attr("x", function(d, i) { return self.x(i) - .5; });
+  };
+
+  BC.prototype.onExit = function(exiting) {
+    var self = this;
+
+    exiting.transition()
+      .duration(1000)
+        .attr("x", function(d, i) { return self.x(i - 1) - .5; })
+        .remove();
+  };
+
   BC.prototype.draw = function() {
 
     var self = this;
     var rect = this.chart.selectAll("rect")
       .data(this._options.data, function(d) { return d.time; });
 
-    rect.enter().insert("rect", "line")
-        .attr("x", function(d, i) { return self.x(i + 1) - .5; })
-        .attr("y", function(d) { return self._options.height - self.y(d.value) - .5; })
-        .attr("width", this._options.width)
-        .attr("height", function(d) { return self.y(d.value); })
-      .transition()
-        .duration(1000)
-        .attr("x", function(d, i) { return self.x(i) - .5; });
-
-    rect.transition()
-        .duration(1000)
-        .attr("x", function(d, i) { return self.x(i) - .5; });
-
-    rect.exit().transition()
-        .duration(1000)
-        .attr("x", function(d, i) { return self.x(i - 1) - .5; })
-        .remove();
+    this.onEnter(rect.enter());
+    this.onUpdate(rect);
+    this.onExit(rect.exit());
   }
 
 }(this));
