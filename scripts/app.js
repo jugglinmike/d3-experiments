@@ -30,6 +30,11 @@
       .attr("width", this._options.width)
       .attr("height", this._options.height);
 
+    this._handlers = {
+      enter: [],
+      update: [],
+      exit: []
+    };
   };
 
   // width
@@ -64,7 +69,11 @@
     return this;
   };
 
-  BC.prototype.onEnter = function(entering) {
+  BC.prototype.on = function(eventName, handler) {
+    this._handlers[eventName].push(handler);
+  };
+
+  BC.prototype._onenter = function(entering) {
     var self = this;
 
     entering
@@ -77,7 +86,7 @@
         .attr("x", function(d, i) { return self.x(i) - .5; });
   };
 
-  BC.prototype.onUpdate = function(updating) {
+  BC.prototype._onupdate = function(updating) {
     var self = this;
 
     updating.transition()
@@ -86,7 +95,7 @@
       .attr("x", function(d, i) { return self.x((i + 0)/self._options.data.length) - .5; });
   };
 
-  BC.prototype.onExit = function(exiting) {
+  BC.prototype._onexit = function(exiting) {
     var self = this;
 
     exiting.transition()
@@ -106,14 +115,31 @@
 
   BC.prototype.draw = function() {
 
-    var self = this;
     var rect = this.chart.selectAll("rect.bar-chart-bar")
       .data(this._options.data, function(d) { return d.time; });
 
-    this.onEnter(this._insert(rect.enter()));
-    this.onUpdate(rect);
-    this.onExit(rect.exit());
-  }
+    this._draw(rect);
+  };
+
+  BC.prototype._draw = function(bound) {
+
+    var selections = {
+      enter: this._insert(bound.enter()),
+      update: bound,
+      exit: bound.exit()
+    };
+
+    _.forEach(this._handlers, function(handlers, eventName) {
+      var selection = selections[eventName];
+
+      this["_on" + eventName].call(this, selection);
+
+      _.forEach(handlers, function(handler) {
+        handler.call(this, selection);
+      }, this);
+
+    }, this);
+  };
 
 }(this));
 
@@ -165,6 +191,13 @@
       width: 301,
       data: series1.data,
       container: "body"
+    });
+
+    myChart.on("enter", function(entering) {
+      entering
+        .classed("bocoup-series-1", true)
+        .attr("height", 5)
+        .attr("fill", "red");
     });
 
     myChart.draw();
