@@ -27,7 +27,7 @@
 
     this.chart = d3.select(this._options.container).append("svg")
       .attr("class", "chart")
-      .attr("width", this._options.width * this._options.data.length - 1)
+      .attr("width", this._options.width)
       .attr("height", this._options.height);
 
   };
@@ -68,9 +68,9 @@
     var self = this;
 
     entering
-      .attr("x", function(d, i) { return self.x(i + 1) - .5; })
+      .attr("x", function(d, i) { return self.x((i + 1)/self._options.data.length) - .5; })
       .attr("y", function(d) { return self._options.height - self.y(d.value) - .5; })
-      .attr("width", this._options.width)
+      .attr("width", this._options.width / this._options.data.length)
       .attr("height", function(d) { return self.y(d.value); })
       .transition()
         .duration(1000)
@@ -82,7 +82,8 @@
 
     updating.transition()
       .duration(1000)
-      .attr("x", function(d, i) { return self.x(i) - .5; });
+      .attr("width", this._options.width / this._options.data.length)
+      .attr("x", function(d, i) { return self.x((i + 0)/self._options.data.length) - .5; });
   };
 
   BC.prototype.onExit = function(exiting) {
@@ -90,7 +91,7 @@
 
     exiting.transition()
       .duration(1000)
-        .attr("x", function(d, i) { return self.x(i - 1) - .5; })
+        .attr("x", function(d, i) { return self.x((i - 1)/self._options.data.length) - .5; })
         .remove();
   };
 
@@ -161,6 +162,7 @@
 
     var myChart = new window.BarChart({
       height: 75,
+      width: 301,
       data: series1.data,
       container: "body"
     });
