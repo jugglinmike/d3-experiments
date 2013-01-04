@@ -2,12 +2,23 @@
 // A constructor for reusable D3.js charts
 (function(window, undefined) {
 
-  var Rc = window.Rc = function() {
+  var Rc = window.Rc = function(options) {
+
     this._handlers = {
       enter: [],
       update: [],
       exit: []
     };
+
+    if (options) {
+      // Extend this instance with the supplied options, falling back to the
+      // default values when unspecified
+      this._options = _.defaults(options, this.defaults);
+
+      if (options.data) {
+        this.data = options.data;
+      }
+    }
 
     this.initialize.apply(this, arguments);
   };
@@ -82,24 +93,18 @@
 // http://mbostock.github.com/d3/tutorial/bar-2.html
 (function(window, undefined) {
 
-  var defaultOpts = {
-    data: [],
-    container: "body",
-    width: 20,
-    height: 80
-  };
-
   var BC = window.BarChart = Rc.extend({
+
+    defaults: {
+      data: [],
+      container: "body",
+      width: 20,
+      height: 80
+    },
 
     initialize: function(options) {
 
       var self = this;
-
-      // Ensure that only expected options are set
-      options = _.pick(options || {}, _.keys(defaultOpts));
-      // Extend this instance with the supplied options, falling back to the
-      // default values when unspecified
-      this._options = _.defaults(options, defaultOpts);
 
       this.x = d3.scale.linear()
         .domain([0, 1])
