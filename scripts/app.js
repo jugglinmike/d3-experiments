@@ -20,6 +20,10 @@
       }
     }
 
+    if (!this.data) {
+      this.data = [];
+    }
+
     this.initialize.apply(this, arguments);
   };
 
@@ -29,10 +33,16 @@
     this._handlers[eventName].push(handler);
   };
 
-  Rc.prototype.draw = function() {
+  Rc.prototype.draw = function(data) {
 
-    var bound = this._draw();
-    var selections = {
+    var bound, selections;
+
+    if (!data) {
+      data = this.data;
+    }
+
+    bound = this._draw(data);
+    selections = {
       enter: this._insert(bound.enter()),
       update: bound,
       exit: bound.exit()
@@ -96,7 +106,6 @@
   var BC = window.BarChart = Rc.extend({
 
     defaults: {
-      data: [],
       container: "body",
       width: 20,
       height: 80
@@ -159,9 +168,9 @@
     var self = this;
 
     entering
-      .attr("x", function(d, i) { return self.x((i + 1)/self._options.data.length) - .5; })
+      .attr("x", function(d, i) { return self.x((i + 1)/self.data.length) - .5; })
       .attr("y", function(d) { return self._options.height - self.y(d.value) - .5; })
-      .attr("width", this._options.width / this._options.data.length)
+      .attr("width", this._options.width / this.data.length)
       .attr("height", function(d) { return self.y(d.value); })
       .transition()
         .duration(1000)
@@ -173,8 +182,8 @@
 
     updating.transition()
       .duration(1000)
-      .attr("width", this._options.width / this._options.data.length)
-      .attr("x", function(d, i) { return self.x((i + 0)/self._options.data.length) - .5; });
+      .attr("width", this._options.width / this.data.length)
+      .attr("x", function(d, i) { return self.x((i + 0)/self.data.length) - .5; });
   };
 
   BC.prototype._onexit = function(exiting) {
@@ -182,7 +191,7 @@
 
     exiting.transition()
       .duration(1000)
-        .attr("x", function(d, i) { return self.x((i - 1)/self._options.data.length) - .5; })
+        .attr("x", function(d, i) { return self.x((i - 1)/self.data.length) - .5; })
         .remove();
   };
 
@@ -195,10 +204,10 @@
       .classed("bar-chart-bar", true);
   };
 
-  BC.prototype._draw = function() {
+  BC.prototype._draw = function(data) {
 
     return this.chart.selectAll("rect.bar-chart-bar")
-      .data(this._options.data, function(d) { return d.time; });
+      .data(data, function(d) { return d.time; });
 
   };
 
