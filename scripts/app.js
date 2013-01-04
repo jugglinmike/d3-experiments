@@ -1,3 +1,85 @@
+// Reusable Chart (Rc)
+// A constructor for reusable D3.js charts
+(function(window, undefined) {
+
+  var Rc = window.Rc = function() {
+    this._handlers = {
+      enter: [],
+      update: [],
+      exit: []
+    };
+
+    this.initialize.apply(this, arguments);
+  };
+
+  Rc.prototype.initialize = function() {};
+
+  Rc.prototype.on = function(eventName, handler) {
+    this._handlers[eventName].push(handler);
+  };
+
+  Rc.prototype.draw = function() {
+
+    var bound = this._draw();
+    var selections = {
+      enter: this._insert(bound.enter()),
+      update: bound,
+      exit: bound.exit()
+    };
+
+    _.forEach(this._handlers, function(handlers, eventName) {
+      var selection = selections[eventName];
+
+      this["_on" + eventName].call(this, selection);
+
+      _.forEach(handlers, function(handler) {
+        handler.call(this, selection);
+      }, this);
+
+    }, this);
+  };
+
+  // Method to correctly set up the prototype chain, for subclasses. Borrowed
+  // from Backbone.js
+  // http://backbonejs.org/
+  Rc.extend = function(protoProps, staticProps) {
+    var parent = this;
+    var child;
+
+    // The constructor function for the new subclass is either defined by you
+    // (the "constructor" property in your `extend` definition), or defaulted
+    // by us to simply call the parent's constructor.
+    if (protoProps && _.has(protoProps, 'constructor')) {
+      child = protoProps.constructor;
+    } else {
+      child = function(){ return parent.apply(this, arguments); };
+    }
+
+    // Add static properties to the constructor function, if supplied.
+    _.extend(child, parent, staticProps);
+
+    // Set the prototype chain to inherit from `parent`, without calling
+    // `parent`'s constructor function.
+    var Surrogate = function(){ this.constructor = child; };
+    Surrogate.prototype = parent.prototype;
+    child.prototype = new Surrogate;
+
+    // Add prototype properties (instance properties) to the subclass, if
+    // supplied.
+    if (protoProps) _.extend(child.prototype, protoProps);
+
+    // Set a convenience property in case the parent's prototype is needed
+    // later.
+    child.__super__ = parent.prototype;
+
+    return child;
+  };
+
+}(this));
+
+// BarChart (BC)
+// A generic bar chart based on the example built in "A Bar Chart, Part 2"
+// http://mbostock.github.com/d3/tutorial/bar-2.html
 (function(window, undefined) {
 
   var defaultOpts = {
@@ -7,35 +89,34 @@
     height: 80
   };
 
-  var BC = window.BarChart = function(options) {
+  var BC = window.BarChart = Rc.extend({
 
-    var self = this;
+    initialize: function(options) {
 
-    // Ensure that only expected options are set
-    options = _.pick(options || {}, _.keys(defaultOpts));
-    // Extend this instance with the supplied options, falling back to the
-    // default values when unspecified
-    this._options = _.defaults(options, defaultOpts);
+      var self = this;
 
-    this.x = d3.scale.linear()
-      .domain([0, 1])
-      .range([0, this._options.width]);
+      // Ensure that only expected options are set
+      options = _.pick(options || {}, _.keys(defaultOpts));
+      // Extend this instance with the supplied options, falling back to the
+      // default values when unspecified
+      this._options = _.defaults(options, defaultOpts);
 
-    this.y = d3.scale.linear()
-      .domain([0, 100])
-      .rangeRound([0, this._options.height]);
+      this.x = d3.scale.linear()
+        .domain([0, 1])
+        .range([0, this._options.width]);
 
-    this.chart = d3.select(this._options.container).append("svg")
-      .attr("class", "chart")
-      .attr("width", this._options.width)
-      .attr("height", this._options.height);
+      this.y = d3.scale.linear()
+        .domain([0, 100])
+        .rangeRound([0, this._options.height]);
 
-    this._handlers = {
-      enter: [],
-      update: [],
-      exit: []
-    };
-  };
+      this.chart = d3.select(this._options.container).append("svg")
+        .attr("class", "chart")
+        .attr("width", this._options.width)
+        .attr("height", this._options.height);
+
+    }
+
+  });
 
   // width
   // If specified, re-set the width of the chart (and return a reference to
@@ -67,10 +148,6 @@
     this.chart.attr("height", height);
     this._options.height = height;
     return this;
-  };
-
-  BC.prototype.on = function(eventName, handler) {
-    this._handlers[eventName].push(handler);
   };
 
   BC.prototype._onenter = function(entering) {
@@ -113,32 +190,11 @@
       .classed("bar-chart-bar", true);
   };
 
-  BC.prototype.draw = function() {
+  BC.prototype._draw = function() {
 
-    var rect = this.chart.selectAll("rect.bar-chart-bar")
+    return this.chart.selectAll("rect.bar-chart-bar")
       .data(this._options.data, function(d) { return d.time; });
 
-    this._draw(rect);
-  };
-
-  BC.prototype._draw = function(bound) {
-
-    var selections = {
-      enter: this._insert(bound.enter()),
-      update: bound,
-      exit: bound.exit()
-    };
-
-    _.forEach(this._handlers, function(handlers, eventName) {
-      var selection = selections[eventName];
-
-      this["_on" + eventName].call(this, selection);
-
-      _.forEach(handlers, function(handler) {
-        handler.call(this, selection);
-      }, this);
-
-    }, this);
   };
 
 }(this));
