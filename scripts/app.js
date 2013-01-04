@@ -144,7 +144,9 @@
 
     // The method is being invoked as a setter
     this.chart.attr("width", width);
+    this.x.range([0, width]);
     this._options.width = width;
+
     return this;
   };
 
@@ -160,7 +162,9 @@
 
     // The method is being invoked as a setter
     this.chart.attr("height", height);
+    this.y.rangeRound([0, height]);
     this._options.height = height;
+
     return this;
   };
 
@@ -172,25 +176,26 @@
       .attr("y", function(d) { return self._options.height - self.y(d.value) - .5; })
       .attr("width", this._options.width / this.data.length)
       .attr("height", function(d) { return self.y(d.value); })
-      .transition()
-        .duration(1000)
+      .transition().duration(1000)
         .attr("x", function(d, i) { return self.x(i) - .5; });
   };
 
   BC.prototype._onupdate = function(updating) {
     var self = this;
 
-    updating.transition()
-      .duration(1000)
-      .attr("width", this._options.width / this.data.length)
-      .attr("x", function(d, i) { return self.x((i + 0)/self.data.length) - .5; });
+    updating
+      .attr("height", function(d) { return self.y(d.value); })
+      .transition().duration(1000)
+        .attr("width", this._options.width / this.data.length)
+        .attr("y", function(d) { return self._options.height - self.y(d.value) - .5; })
+        .attr("x", function(d, i) { return self.x((i + 0)/self.data.length) - .5; });
   };
 
   BC.prototype._onexit = function(exiting) {
     var self = this;
 
-    exiting.transition()
-      .duration(1000)
+    exiting
+      .transition().duration(1000)
         .attr("x", function(d, i) { return self.x((i - 1)/self.data.length) - .5; })
         .remove();
   };
