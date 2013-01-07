@@ -38,13 +38,11 @@
   // inserted.
   Rc.prototype.insert = function() {};
 
-  Rc.prototype._handlers = {
-    enter: [],
-    update: [],
-    exit: []
-  };
-
   Rc.prototype.on = function(eventName, handler) {
+
+    if (!_.has(this, "_handlers")) {
+      this._handlers = _.clone(this._handlers) || {};
+    }
 
     if (!this._handlers[eventName]) {
       this._handlers[eventName] = [];
