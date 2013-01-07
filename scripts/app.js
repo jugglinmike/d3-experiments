@@ -33,7 +33,10 @@
   // Given a data object, bind it to a d3 selection.
   Rc.prototype.dataBind = function() {};
 
-  Rc.prototype._insert = function() {};
+  // insert
+  // Given an entering selection, return a selection that has new elements
+  // inserted.
+  Rc.prototype.insert = function() {};
 
   Rc.prototype.on = function(eventName, handler) {
     this._handlers[eventName].push(handler);
@@ -50,7 +53,7 @@
     bound = this.dataBind(data);
 
     selections = {
-      enter: this._insert(bound.enter()),
+      enter: this.insert(bound.enter()),
       update: bound,
       exit: bound.exit()
     };
@@ -137,6 +140,15 @@
 
     },
 
+    // insert
+    // Generate a new element for entering data. This method should not be
+    // invoked directly nor overiddent, but it is defined to promote readability.
+    insert: function(entering) {
+      return entering
+        .insert("rect")
+        .classed("bar-chart-bar", true);
+    },
+
     dataBind: function(data) {
 
       return this.chart.selectAll("rect.bar-chart-bar")
@@ -213,16 +225,6 @@
         .attr("x", function(d, i) { return self.x((i - 1)/self.data.length) - .5; })
         .remove();
   };
-
-  // _insert
-  // Generate a new element for entering data. This method should not be
-  // invoked directly nor overiddent, but it is defined to promote readability.
-  BC.prototype._insert = function(entering) {
-    return entering
-      .insert("rect")
-      .classed("bar-chart-bar", true);
-  };
-
 
 }(this));
 
