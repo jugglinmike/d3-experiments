@@ -44,6 +44,38 @@
       return this.chart.selectAll("rect.bar-chart-bar")
         .data(data, function(d) { return d.time; });
 
+    },
+
+    events: {
+      enter: function(entering) {
+        var self = this;
+
+        entering
+          .attr("x", function(d, i) { return self.x((i + 1)/self.data.length) - .5; })
+          .attr("y", function(d) { return self._options.height - self.y(d.value) - .5; })
+          .attr("width", this._options.width / this.data.length)
+          .attr("height", function(d) { return self.y(d.value); })
+          .transition().duration(1000)
+            .attr("x", function(d, i) { return self.x(i) - .5; });
+      },
+      update: function(updating) {
+        var self = this;
+
+        updating
+          .attr("height", function(d) { return self.y(d.value); })
+          .transition().duration(1000)
+            .attr("width", this._options.width / this.data.length)
+            .attr("y", function(d) { return self._options.height - self.y(d.value) - .5; })
+            .attr("x", function(d, i) { return self.x((i + 0)/self.data.length) - .5; });
+      },
+      exit: function(exiting) {
+        var self = this;
+
+        exiting
+          .transition().duration(1000)
+            .attr("x", function(d, i) { return self.x((i - 1)/self.data.length) - .5; })
+            .remove();
+      }
     }
 
   });
@@ -82,38 +114,6 @@
     this._options.height = height;
 
     return this;
-  };
-
-  BC.prototype._onenter = function(entering) {
-    var self = this;
-
-    entering
-      .attr("x", function(d, i) { return self.x((i + 1)/self.data.length) - .5; })
-      .attr("y", function(d) { return self._options.height - self.y(d.value) - .5; })
-      .attr("width", this._options.width / this.data.length)
-      .attr("height", function(d) { return self.y(d.value); })
-      .transition().duration(1000)
-        .attr("x", function(d, i) { return self.x(i) - .5; });
-  };
-
-  BC.prototype._onupdate = function(updating) {
-    var self = this;
-
-    updating
-      .attr("height", function(d) { return self.y(d.value); })
-      .transition().duration(1000)
-        .attr("width", this._options.width / this.data.length)
-        .attr("y", function(d) { return self._options.height - self.y(d.value) - .5; })
-        .attr("x", function(d, i) { return self.x((i + 0)/self.data.length) - .5; });
-  };
-
-  BC.prototype._onexit = function(exiting) {
-    var self = this;
-
-    exiting
-      .transition().duration(1000)
-        .attr("x", function(d, i) { return self.x((i - 1)/self.data.length) - .5; })
-        .remove();
   };
 
 }(this));

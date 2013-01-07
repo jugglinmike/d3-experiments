@@ -4,12 +4,6 @@
 
   var Rc = window.Rc = function(options) {
 
-    this._handlers = {
-      enter: [],
-      update: [],
-      exit: []
-    };
-
     if (options) {
       // Extend this instance with the supplied options, falling back to the
       // default values when unspecified
@@ -23,6 +17,12 @@
     if (!this.data) {
       this.data = [];
     }
+
+    // Clone all event handlers
+    this._handlers = _.clone(this._handlers);
+    _.forEach(this._handlers, function(handlers, eventName, _handlers) {
+      _handlers[eventName] = _.clone(handlers);
+    });
 
     this.initialize.apply(this, arguments);
   };
@@ -38,7 +38,18 @@
   // inserted.
   Rc.prototype.insert = function() {};
 
+  Rc.prototype._handlers = {
+    enter: [],
+    update: [],
+    exit: []
+  };
+
   Rc.prototype.on = function(eventName, handler) {
+
+    if (!this._handlers[eventName]) {
+      this._handlers[eventName] = [];
+    }
+
     this._handlers[eventName].push(handler);
   };
 
@@ -60,8 +71,6 @@
 
     _.forEach(this._handlers, function(handlers, eventName) {
       var selection = selections[eventName];
-
-      this["_on" + eventName].call(this, selection);
 
       _.forEach(handlers, function(handler) {
         handler.call(this, selection);
@@ -102,6 +111,10 @@
     // Set a convenience property in case the parent's prototype is needed
     // later.
     child.__super__ = parent.prototype;
+
+    _.forEach(protoProps.events, function(handler, eventName) {
+      this.on(eventName, handler);
+    }, child.prototype);
 
     return child;
   };
