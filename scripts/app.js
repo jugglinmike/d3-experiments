@@ -29,6 +29,12 @@
 
   Rc.prototype.initialize = function() {};
 
+  // dataBind
+  // Given a data object, bind it to a d3 selection.
+  Rc.prototype.dataBind = function() {};
+
+  Rc.prototype._insert = function() {};
+
   Rc.prototype.on = function(eventName, handler) {
     this._handlers[eventName].push(handler);
   };
@@ -41,7 +47,8 @@
       data = this.data;
     }
 
-    bound = this._draw(data);
+    bound = this.dataBind(data);
+
     selections = {
       enter: this._insert(bound.enter()),
       update: bound,
@@ -128,6 +135,13 @@
         .attr("width", this._options.width)
         .attr("height", this._options.height);
 
+    },
+
+    dataBind: function(data) {
+
+      return this.chart.selectAll("rect.bar-chart-bar")
+        .data(data, function(d) { return d.time; });
+
     }
 
   });
@@ -209,12 +223,6 @@
       .classed("bar-chart-bar", true);
   };
 
-  BC.prototype._draw = function(data) {
-
-    return this.chart.selectAll("rect.bar-chart-bar")
-      .data(data, function(d) { return d.time; });
-
-  };
 
 }(this));
 
