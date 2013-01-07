@@ -62,6 +62,15 @@
 
       myChart.draw();
     }, 1500);
+
+    var myTreeMap = new window.TreeMap({
+      container: "body"
+    });
+
+    d3.json("data/flare.json", function(data) {
+      myTreeMap.draw(data);
+    });
+
   }, false);
 
 }(this));
