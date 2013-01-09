@@ -11,6 +11,9 @@ function chord(options) {
       .attr("height", height)
     .append("g")
       .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+  var handles = svg.append("g").attr("class", "handles");
+  var ticks = svg.append("g").attr("class", "ticks");
+  var chords = svg.append("g").attr("class", "chords");
   var chord = d3.layout.chord()
       .padding(.05)
       .sortSubgroups(d3.descending)
@@ -20,10 +23,7 @@ function chord(options) {
 
   // addHandles
   function addHandles() {
-    this.selectAll("path")
-        .data(chord.groups)
-      .enter().append("path")
-        .style("fill", function(d) { return fill(d.index); })
+    this.style("fill", function(d) { return fill(d.index); })
         .style("stroke", function(d) { return fill(d.index); })
         .attr("d", d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
         .on("mouseover", fade(.1))
@@ -32,24 +32,19 @@ function chord(options) {
 
   function addTicks() {
 
-    var ticks = this.selectAll("g")
-        .data(chord.groups)
-      .enter().append("g").selectAll("g")
-        .data(groupTicks)
-      .enter().append("g")
-        .attr("transform", function(d) {
+    this.attr("transform", function(d) {
           return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
               + "translate(" + outerRadius + ",0)";
         });
 
-    ticks.append("line")
+    this.append("line")
       .attr("x1", 1)
       .attr("y1", 0)
       .attr("x2", 5)
       .attr("y2", 0)
       .style("stroke", "#000");
 
-    ticks.append("text")
+    this.append("text")
       .attr("x", 8)
       .attr("dy", ".35em")
       .attr("transform", function(d) {
@@ -60,12 +55,7 @@ function chord(options) {
   }
 
   function addChords() {
-
-    this
-      .selectAll("path")
-        .data(chord.chords)
-      .enter().append("path")
-        .attr("d", d3.svg.chord().radius(innerRadius))
+    this.attr("d", d3.svg.chord().radius(innerRadius))
         .style("fill", function(d) { return fill(d.target.index); })
         .style("opacity", 1);
   }
@@ -73,11 +63,22 @@ function chord(options) {
   return function(matrix) {
 
     chord.matrix(matrix);
-    svg.selectAll("g").remove();
+    svg.selectAll("g").selectAll("g, path").remove();
 
-    svg.append("g").attr("class", "handles").call(addHandles);
-    svg.append("g").attr("class", "ticks").call(addTicks);
-    svg.append("g").attr("class", "chords").call(addChords);
+    handles.selectAll("path")
+        .data(chord.groups)
+      .enter().append("path")
+      .call(addHandles);
+
+    ticks.selectAll("g")
+        .data(chord.groups)
+      .enter().append("g").selectAll("g")
+        .data(groupTicks)
+      .enter().append("g").call(addTicks);
+
+    chords.selectAll("path")
+        .data(chord.chords)
+      .enter().append("path").call(addChords);
 
   }
 
