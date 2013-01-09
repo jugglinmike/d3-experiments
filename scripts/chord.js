@@ -32,19 +32,23 @@ function chord(options) {
 
   function addTicks() {
 
-    this.attr("transform", function(d) {
+    var tickGroup = this.selectAll("g")
+        .data(groupTicks)
+      .enter().append("g")
+
+    tickGroup.attr("transform", function(d) {
           return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
               + "translate(" + outerRadius + ",0)";
         });
 
-    this.append("line")
+    tickGroup.append("line")
       .attr("x1", 1)
       .attr("y1", 0)
       .attr("x2", 5)
       .attr("y2", 0)
       .style("stroke", "#000");
 
-    this.append("text")
+    tickGroup.append("text")
       .attr("x", 8)
       .attr("dy", ".35em")
       .attr("transform", function(d) {
@@ -72,13 +76,13 @@ function chord(options) {
 
     ticks.selectAll("g")
         .data(chord.groups)
-      .enter().append("g").selectAll("g")
-        .data(groupTicks)
-      .enter().append("g").call(addTicks);
+      .enter().append("g")
+      .call(addTicks);
 
     chords.selectAll("path")
         .data(chord.chords)
-      .enter().append("path").call(addChords);
+      .enter().append("path")
+      .call(addChords);
 
   }
 
