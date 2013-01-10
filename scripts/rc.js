@@ -2,14 +2,18 @@
 // A constructor for reusable D3.js charts
 (function(window, undefined) {
 
-  var Rc = window.Rc = function(options) {
+  "use strict";
 
-    if (options) {
-      // Extend this instance with the supplied options, falling back to the
-      // default values when unspecified
-      this.options = _.defaults(options, this.defaults);
+  var Rc = window.Rc = function() {
+
+    this.options = {};
+
+    // Merge all parameters into a single "options" collection
+    if (arguments.length) {
+      _.assign.apply(_, [this.options].concat(Array.prototype.slice.call(arguments)));
     }
 
+    _.defaults(this.options, this.defaults);
     this.data = this.options.data || [];
     this.base = this.options.base;
 
