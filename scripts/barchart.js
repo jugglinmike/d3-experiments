@@ -17,16 +17,16 @@
 
       this.x = d3.scale.linear()
         .domain([0, 1])
-        .range([0, this._options.width]);
+        .range([0, this.options.width]);
 
       this.y = d3.scale.linear()
         .domain([0, 100])
-        .rangeRound([0, this._options.height]);
+        .rangeRound([0, this.options.height]);
 
-      this.chart = d3.select(this._options.container).append("svg")
+      this.chart = d3.select(this.options.container).append("svg")
         .attr("class", "chart")
-        .attr("width", this._options.width)
-        .attr("height", this._options.height);
+        .attr("width", this.options.width)
+        .attr("height", this.options.height);
 
     },
 
@@ -52,8 +52,8 @@
 
         entering
           .attr("x", function(d, i) { return self.x((i + 1)/self.data.length) - .5; })
-          .attr("y", function(d) { return self._options.height - self.y(d.value) - .5; })
-          .attr("width", this._options.width / this.data.length)
+          .attr("y", function(d) { return self.options.height - self.y(d.value) - .5; })
+          .attr("width", this.options.width / this.data.length)
           .attr("height", function(d) { return self.y(d.value); })
           .transition().duration(1000)
             .attr("x", function(d, i) { return self.x(i) - .5; });
@@ -64,8 +64,8 @@
         updating
           .attr("height", function(d) { return self.y(d.value); })
           .transition().duration(1000)
-            .attr("width", this._options.width / this.data.length)
-            .attr("y", function(d) { return self._options.height - self.y(d.value) - .5; })
+            .attr("width", this.options.width / this.data.length)
+            .attr("y", function(d) { return self.options.height - self.y(d.value) - .5; })
             .attr("x", function(d, i) { return self.x((i + 0)/self.data.length) - .5; });
       },
       exit: function(exiting) {
@@ -87,13 +87,13 @@
   BC.prototype.width = function(width) {
     // The method is being invoked as a getter
     if (!arguments.length) {
-      return this._options.width;
+      return this.options.width;
     }
 
     // The method is being invoked as a setter
     this.chart.attr("width", width);
     this.x.range([0, width]);
-    this._options.width = width;
+    this.options.width = width;
 
     return this;
   };
@@ -105,13 +105,13 @@
   BC.prototype.height = function(height) {
     // The method is being invoked as a getter
     if (!arguments.length) {
-      return this._options.height;
+      return this.options.height;
     }
 
     // The method is being invoked as a setter
     this.chart.attr("height", height);
     this.y.rangeRound([0, height]);
-    this._options.height = height;
+    this.options.height = height;
 
     return this;
   };

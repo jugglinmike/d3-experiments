@@ -17,22 +17,22 @@
 
       this.map = d3.layout.treemap()
         .round(false)
-        .size([this._options.width, this._options.height])
+        .size([this.options.width, this.options.height])
         .sticky(true)
         .value(function(d) { return d.size; });
 
-      this.x = d3.scale.linear().range([0, this._options.width]);
-      this.y = d3.scale.linear().range([0, this._options.height]);
+      this.x = d3.scale.linear().range([0, this.options.width]);
+      this.y = d3.scale.linear().range([0, this.options.height]);
       this.color = d3.scale.category20c();
 
-      this.chart = d3.select(this._options.container)
+      this.chart = d3.select(this.options.container)
         .append("div")
           .attr("class", "chart")
-          .style("width", this._options.width + "px")
-          .style("height", this._options.height + "px")
+          .style("width", this.options.width + "px")
+          .style("height", this.options.height + "px")
           .append("svg:svg")
-            .attr("width", this._options.width)
-            .attr("height", this._options.height)
+            .attr("width", this.options.width)
+            .attr("height", this.options.height)
             .append("svg:g")
               .attr("transform", "translate(.5, .5)");
 
@@ -87,8 +87,8 @@
 
     zoom: function(d) {
       var self = this;
-      var kx = this._options.width / d.dx;
-      var ky = this._options.height / d.dy;
+      var kx = this.options.width / d.dx;
+      var ky = this.options.height / d.dy;
       var t;
 
       this.x.domain([d.x, d.x + d.dx]);

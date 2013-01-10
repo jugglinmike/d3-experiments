@@ -7,7 +7,7 @@
     if (options) {
       // Extend this instance with the supplied options, falling back to the
       // default values when unspecified
-      this._options = _.defaults(options, this.defaults);
+      this.options = _.defaults(options, this.defaults);
 
       if (options.data) {
         this.data = options.data;
@@ -18,7 +18,7 @@
       this.data = [];
     }
 
-    this.base = this._options.base;
+    this.base = this.options.base;
 
     // Clone all event handlers
     this._handlers = _.clone(this._handlers);
