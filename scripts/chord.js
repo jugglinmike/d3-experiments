@@ -11,124 +11,121 @@ function chord(options) {
       .attr("height", height)
     .append("g")
       .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-  var handles = svg.append("g").attr("class", "handles");
-  var ticks = svg.append("g").attr("class", "ticks");
-  var chords = svg.append("g").attr("class", "chords");
-  var chord = d3.layout.chord()
+  var chordLayout = d3.layout.chord()
       .padding(.05)
       .sortSubgroups(d3.descending)
   var fill = d3.scale.ordinal()
       .domain(d3.range(4))
       .range(["#000000", "#FFDD89", "#957244", "#F26223"]);
 
-  // addHandles
-  function addHandles() {
-    this.style("fill", function(d) { return fill(d.index); })
-        .style("stroke", function(d) { return fill(d.index); })
-        .attr("d", d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
-        .on("mouseover", fade(.1))
-        .on("mouseout", fade(1));
-  }
+  var Ticks = Rc.extend({
+    dataBind: function(data) {
+      return this.base.selectAll("g").data(data);
+    },
+    insert: function(entering) {
+      return entering.append("g");
+    },
+    events: {
+      enter: function(entering) {
+        var tickGroup = entering.selectAll("g")
+            .data(this.group)
+          .enter().append("g");
 
-  function addTicks() {
+        tickGroup.attr("transform", function(d) {
+              return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
+                  + "translate(" + outerRadius + ",0)";
+            });
 
-    var tickGroup = this.selectAll("g")
-        .data(groupTicks)
-      .enter().append("g")
+        tickGroup.append("line")
+          .attr("x1", 1)
+          .attr("y1", 0)
+          .attr("x2", 5)
+          .attr("y2", 0)
+          .style("stroke", "#000");
 
-    tickGroup.attr("transform", function(d) {
-          return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
-              + "translate(" + outerRadius + ",0)";
-        });
+        tickGroup.append("text")
+          .attr("x", 8)
+          .attr("dy", ".35em")
+          .attr("transform", function(d) {
+            return d.angle > Math.PI ? "rotate(180)translate(-16)" : null;
+          })
+          .style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
+          .text(function(d) { return d.label; });
 
-    tickGroup.append("line")
-      .attr("x1", 1)
-      .attr("y1", 0)
-      .attr("x2", 5)
-      .attr("y2", 0)
-      .style("stroke", "#000");
+      }
+    },
+    // Returns an array of tick angles and labels, given a group.
+    group: function(d) {
+      var k = (d.endAngle - d.startAngle) / d.value;
+      return d3.range(0, d.value, 1000).map(function(v, i) {
+        return {
+          angle: v * k + d.startAngle,
+          label: i % 5 ? null : v / 1000 + "k"
+        };
+      });
+    }
+  });
 
-    tickGroup.append("text")
-      .attr("x", 8)
-      .attr("dy", ".35em")
-      .attr("transform", function(d) {
-        return d.angle > Math.PI ? "rotate(180)translate(-16)" : null;
-      })
-      .style("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
-      .text(function(d) { return d.label; });
-  }
+  var Handles = Rc.extend({
+    dataBind: function(data) {
+      return this.base.selectAll("path").data(data);
+    },
+    insert: function(entering) {
+      return entering.append("path");
+    },
+    events: {
+      enter: function(entering) {
+        entering.style("fill", function(d) { return fill(d.index); })
+            .style("stroke", function(d) { return fill(d.index); })
+            .attr("d", d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
+            .on("mouseover", this.fade(.1))
+            .on("mouseout", this.fade(1));
+      }
+    },
+    // Returns an event handler for fading a given chord group.
+    fade: function(opacity) {
+      return function(g, i) {
+        svg.selectAll(".chords path")
+            .filter(function(d) { return d.source.index != i && d.target.index != i; })
+          .transition()
+            .style("opacity", opacity);
+      };
+    }
+  });
 
-  function addChords() {
-    this.attr("d", d3.svg.chord().radius(innerRadius))
-        .style("fill", function(d) { return fill(d.target.index); })
-        .style("opacity", 1);
-  }
+  var Chords = Rc.extend({
+    dataBind: function(data) {
+      return this.base.selectAll("path").data(data);
+    },
+    insert: function(entering) {
+      return entering.append("path");
+    },
+    events: {
+      enter: function(entering) {
+        entering.attr("d", d3.svg.chord().radius(innerRadius))
+            .style("fill", function(d) { return fill(d.target.index); })
+            .style("opacity", 1);
+      }
+    }
+  });
+
+  var ticks = new Ticks({ base: svg.append("g").attr("class", "ticks") });
+  var handles = new Handles({ base: svg.append("g").attr("class", "events") });
+  var chords = new Chords({ base: svg.append("g").attr("class", "chords") });
 
   return function(matrix) {
 
-    chord.matrix(matrix);
+    chordLayout.matrix(matrix);
     svg.selectAll("g").selectAll("g, path").remove();
 
-    handles.selectAll("path")
-        .data(chord.groups)
-      .enter().append("path")
-      .call(addHandles);
-
-    ticks.selectAll("g")
-        .data(chord.groups)
-      .enter().append("g")
-      .call(addTicks);
-
-    chords.selectAll("path")
-        .data(chord.chords)
-      .enter().append("path")
-      .call(addChords);
+    handles.draw(chordLayout.groups);
+    ticks.draw(chordLayout.groups);
+    chords.draw(chordLayout.chords);
 
   }
 
-  // Returns an array of tick angles and labels, given a group.
-  function groupTicks(d) {
-    var k = (d.endAngle - d.startAngle) / d.value;
-    return d3.range(0, d.value, 1000).map(function(v, i) {
-      return {
-        angle: v * k + d.startAngle,
-        label: i % 5 ? null : v / 1000 + "k"
-      };
-    });
-  }
-
-  // Returns an event handler for fading a given chord group.
-  function fade(opacity) {
-    return function(g, i) {
-      svg.selectAll(".chords path")
-          .filter(function(d) { return d.source.index != i && d.target.index != i; })
-        .transition()
-          .style("opacity", opacity);
-    };
-  }
 }
 
-document.addEventListener( "DOMContentLoaded", function() {
-  // From http://mkweb.bcgsc.ca/circos/guide/tables/
-  var matrix = [
-    [11975,  5871, 8916, 2868],
-    [ 1951, 10048, 2060, 6171],
-    [ 8010, 16145, 8090, 8045],
-    [ 1013,   990,  940, 6907]
-  ];
-  var myChord = chord({ container: "body" });
-
-  myChord(matrix);
-
-  setInterval(function() {
-    matrix.forEach(function(row, idx) {
-      row.forEach(function(_, jdx) {
-        row[idx] = Math.random() * 3000 * (jdx + 1);
-      });
-    });
-    myChord(matrix);
-  }, 1500);
-
-}, false);
+window.chord = chord;
 
 }(this));

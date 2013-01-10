@@ -18,6 +18,8 @@
       this.data = [];
     }
 
+    this.base = this._options.base;
+
     // Clone all event handlers
     this._handlers = _.clone(this._handlers);
     _.forEach(this._handlers, function(handlers, eventName, _handlers) {
