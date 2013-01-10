@@ -106,38 +106,40 @@
     }
   });
 
+  var dfltOpts = {
+    width: 960,
+    height: 500,
+    container: "body"
+  };
+
   function chord(options) {
 
-    var width = 960,
-        height = 500,
-        innerRadius = Math.min(width, height) * .41,
-        outerRadius = innerRadius * 1.1;
-    var svg = d3.select(options.container).append("svg")
-        .attr("width", width)
-        .attr("height", height)
-      .append("g")
-        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-    var chordLayout = d3.layout.chord()
-        .padding(.05)
-        .sortSubgroups(d3.descending)
-    var fill = d3.scale.ordinal()
+    var svg, chordLayout;
+
+    options = _.defaults(options, dfltOpts);
+    options.innerRadius = Math.min(options.width, options.height) * 0.41;
+    options.outerRadius = options.innerRadius * 1.1;
+    options.fill = d3.scale.ordinal()
         .domain(d3.range(4))
         .range(["#000000", "#FFDD89", "#957244", "#F26223"]);
 
-    var ticks = new Ticks({
-      base: svg.append("g").attr("class", "ticks"),
-      outerRadius: outerRadius
+    svg = d3.select(options.container).append("svg")
+        .attr("width", options.width)
+        .attr("height", options.height)
+      .append("g")
+        .attr("transform", "translate(" + options.width / 2 + "," + options.height / 2 + ")");
+    chordLayout = d3.layout.chord()
+        .padding(.05)
+        .sortSubgroups(d3.descending)
+
+    var ticks = new Ticks(options, {
+      base: svg.append("g").attr("class", "ticks")
     });
-    var handles = new Handles({
-      base: svg.append("g").attr("class", "events"),
-      fill: fill,
-      innerRadius: innerRadius,
-      outerRadius: outerRadius
+    var handles = new Handles(options, {
+      base: svg.append("g").attr("class", "events")
     });
-    var chords = new Chords({
-      base: svg.append("g").attr("class", "chords"),
-      fill: fill,
-      innerRadius: innerRadius
+    var chords = new Chords(options, {
+      base: svg.append("g").attr("class", "chords")
     });
 
     return function(matrix) {
