@@ -101,53 +101,52 @@
     }
   });
 
-function chord(options) {
+  function chord(options) {
 
-  var width = 960,
-      height = 500,
-      innerRadius = Math.min(width, height) * .41,
-      outerRadius = innerRadius * 1.1;
-  var svg = d3.select(options.container).append("svg")
-      .attr("width", width)
-      .attr("height", height)
-    .append("g")
-      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-  var chordLayout = d3.layout.chord()
-      .padding(.05)
-      .sortSubgroups(d3.descending)
-  var fill = d3.scale.ordinal()
-      .domain(d3.range(4))
-      .range(["#000000", "#FFDD89", "#957244", "#F26223"]);
+    var width = 960,
+        height = 500,
+        innerRadius = Math.min(width, height) * .41,
+        outerRadius = innerRadius * 1.1;
+    var svg = d3.select(options.container).append("svg")
+        .attr("width", width)
+        .attr("height", height)
+      .append("g")
+        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+    var chordLayout = d3.layout.chord()
+        .padding(.05)
+        .sortSubgroups(d3.descending)
+    var fill = d3.scale.ordinal()
+        .domain(d3.range(4))
+        .range(["#000000", "#FFDD89", "#957244", "#F26223"]);
 
-  var ticks = new Ticks({
-    base: svg.append("g").attr("class", "ticks"),
-    outerRadius: outerRadius
-  });
-  var handles = new Handles({
-    base: svg.append("g").attr("class", "events"),
-    fill: fill,
-    innerRadius: innerRadius,
-    outerRadius: outerRadius
-  });
-  var chords = new Chords({
-    base: svg.append("g").attr("class", "chords"),
-    fill: fill,
-    innerRadius: innerRadius
-  });
+    var ticks = new Ticks({
+      base: svg.append("g").attr("class", "ticks"),
+      outerRadius: outerRadius
+    });
+    var handles = new Handles({
+      base: svg.append("g").attr("class", "events"),
+      fill: fill,
+      innerRadius: innerRadius,
+      outerRadius: outerRadius
+    });
+    var chords = new Chords({
+      base: svg.append("g").attr("class", "chords"),
+      fill: fill,
+      innerRadius: innerRadius
+    });
 
-  return function(matrix) {
+    return function(matrix) {
 
-    chordLayout.matrix(matrix);
-    svg.selectAll("g").selectAll("g, path").remove();
+      chordLayout.matrix(matrix);
+      svg.selectAll("g").selectAll("g, path").remove();
 
-    handles.draw(chordLayout.groups);
-    ticks.draw(chordLayout.groups);
-    chords.draw(chordLayout.chords);
+      handles.draw(chordLayout.groups);
+      ticks.draw(chordLayout.groups);
+      chords.draw(chordLayout.chords);
 
+    };
   }
 
-}
-
-window.chord = chord;
+  window.chord = chord;
 
 }(this));
