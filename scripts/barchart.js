@@ -3,6 +3,8 @@
 // http://mbostock.github.com/d3/tutorial/bar-2.html
 (function(window, undefined) {
 
+  "use strict";
+
   var BC = window.BarChart = Rc.extend({
 
     defaults: {

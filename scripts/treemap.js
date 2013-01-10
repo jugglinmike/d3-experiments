@@ -3,6 +3,8 @@
 // http://mbostock.github.com/d3/talk/20111018/treemap.html
 (function(window, undefined) {
 
+  "use strict";
+
   var TM = window.TreeMap = Rc.extend({
 
     defaults: {

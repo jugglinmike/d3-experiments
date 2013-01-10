@@ -1,5 +1,7 @@
 (function(window, undefined) {
 
+  "use strict";
+
   var Chords = Rc.extend({
     dataBind: function(data) {
       return this.base.selectAll("path").data(data);
