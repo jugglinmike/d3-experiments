@@ -96,8 +96,9 @@
     },
     // Returns an event handler for fading a given chord group.
     fade: function(opacity) {
+      var self = this;
       return function(g, i) {
-        svg.selectAll(".chords path")
+        self.base.selectAll(".chords path")
             .filter(function(d) { return d.source.index != i && d.target.index != i; })
           .transition()
             .style("opacity", opacity);
