@@ -69,6 +69,8 @@
     }
   });
 
+  // Handles
+  // A group defining the colored margins that encircle the chart.
   var Handles = Rc.extend({
     dataBind: function(data) {
       return this.base.selectAll("path").data(data);
@@ -147,6 +149,7 @@
     };
   }
 
+  // Expose "constructor" to global scope
   window.chord = chord;
 
 }(this));
