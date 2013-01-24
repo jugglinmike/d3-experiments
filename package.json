@@ -1,0 +1,18 @@
+{
+  "name": "d3-exp",
+  "version": "0.0.1",
+  "description": "Some light frameworks for organizing visualizations in D3.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jugglinmike/d3-exp"
+  },
+  "author": "Mike Pennisi",
+  "devDependencies": {
+    "grunt": "0.4.0rc5",
+    "grunt-mocha": "~0.2",
+    "grunt-contrib-jshint": "*"
+  }
+}

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Mocha Tests</title>
+	<link rel="stylesheet" href="vendor/mocha.css" />
+	<script src="vendor/expect.js"></script>
+	<script src="vendor/mocha.js"></script>
+	<script>
+			mocha.setup('tdd');
+	</script>
+	<script src="vendor/jquery.js"></script>
+	<script src="vendor/lodash.js"></script>
+
+	<!-- application dependencies -->
+	<script src="../scripts/lib/d3.v3.js"></script>
+
+	<!-- application files -->
+	<script src="../scripts/d3-layer.js"></script>
+	<script src="../scripts/d3-chart.js"></script>
+
+	<!-- test files -->
+	<script src="tests/d3-layer.js"></script>
+	<script src="tests/d3-chart.js"></script>
+</head>
+<body>
+	<div id="mocha"></div>
+	<div id="test"></div>
+
+	<script>
+			mocha.run();
+	</script>
+</body>
+</html>
