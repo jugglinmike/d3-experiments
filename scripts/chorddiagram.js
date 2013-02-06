@@ -1,4 +1,4 @@
-window.Chord = d3.chart.extend({
+window.Chord = d3.chart({
 
   initialize: function(options) {
 
@@ -14,8 +14,8 @@ window.Chord = d3.chart.extend({
         .domain(d3.range(4))
         .range(["#000000", "#FFDD89", "#957244", "#F26223"]);
 
-    this.base = d3.select("body").append("svg")
-        .attr("width", width)
+    this.base = options.base || d3.select("body").append("svg");
+    this.base.attr("width", width)
         .attr("height", height)
       .append("g")
         .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");

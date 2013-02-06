@@ -1,4 +1,4 @@
-window.Barchart = d3.chart.extend({
+window.Barchart = d3.chart({
 
   initialize: function(options) {
     var svg,
@@ -26,7 +26,7 @@ window.Barchart = d3.chart.extend({
       .domain([0, 100])
       .rangeRound([0, h]);
 
-    var svg = d3.select("body").append("svg")
+    var svg = options.base || d3.select("body").append("svg")
       .attr("class", "chart")
       .attr("width", w * data.length - 1)
       .attr("height", h);
