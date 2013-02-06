@@ -49,7 +49,6 @@
   });
   myChord2.draw(matrix);
 
-  var base = d3.select("body").append("svg");
   var myWackyChord = new WackyChord();
   myWackyChord.draw(matrix);
 

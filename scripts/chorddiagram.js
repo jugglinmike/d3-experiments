@@ -14,7 +14,6 @@ window.Chord = d3.chart({
         .domain(d3.range(4))
         .range(["#000000", "#FFDD89", "#957244", "#F26223"]);
 
-    this.base = options.base || d3.select("body").append("svg");
     this.base.attr("width", width)
         .attr("height", height)
       .append("g")

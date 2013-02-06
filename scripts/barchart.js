@@ -26,7 +26,7 @@ window.Barchart = d3.chart({
       .domain([0, 100])
       .rangeRound([0, h]);
 
-    var svg = options.base || d3.select("body").append("svg")
+    var svg = this.base
       .attr("class", "chart")
       .attr("width", w * data.length - 1)
       .attr("height", h);
