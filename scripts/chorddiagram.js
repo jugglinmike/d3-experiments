@@ -1,23 +1,49 @@
 window.Chord = d3.chart({
 
+  width: function(width) {
+    if (arguments.length === 0) {
+      return this._w;
+    }
+    this._w = width;
+    this.setRadius();
+    return this;
+  },
+
+  height: function(height) {
+    if (arguments.length === 0) {
+      return this._h;
+    }
+    this._h = height;
+    this.setRadius();
+    return this;
+  },
+
+  radius: function() {
+    return { inner: this.innerRadius, outer: this.outerRadius };
+  },
+  setRadius: function(radius) {
+    radius = radius || (Math.min(this.width(), this.height()) * 0.41);
+    this.outerRadius = radius;
+    this.innerRadius = radius / 1.1;
+    return this;
+  },
+
   initialize: function(options) {
 
     options = options || {};
 
-    var width = options.width || 960,
-        height = options.height || 500,
-        innerRadius = Math.min(width, height) * .41,
-        outerRadius = innerRadius * 1.1,
-        chart = this;
+    var chart = this;
+    this.width(options.width || 960);
+    this.height(options.height || 500);
+    this.setRadius();
 
     var fill = d3.scale.ordinal()
         .domain(d3.range(4))
         .range(["#000000", "#FFDD89", "#957244", "#F26223"]);
 
-    this.base.attr("width", width)
-        .attr("height", height)
-      .append("g")
-        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+    this.base.attr("width", this.width())
+        .attr("height", this.height())
+        .attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
 
     this.layers.handles = chart.base.append("g").layer({
       dataBind: function(chord) {
@@ -30,14 +56,14 @@ window.Chord = d3.chart({
     this.layers.handles.on("enter", function() {
       this.style("fill", function(d) { return fill(d.index); })
           .style("stroke", function(d) { return fill(d.index); })
-          .attr("d", d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
+          .attr("d", d3.svg.arc().innerRadius(chart.radius().inner).outerRadius(chart.radius().outer))
           .on("mouseover", chart.fade(.1))
           .on("mouseout", chart.fade(1));
     });
 
     this.layers.ticks = this.base.append("g").layer({
       dataBind: function(chord) {
-        return chart.base.append("g").selectAll("g")
+        return this.selectAll("g")
             .data(chord.groups)
           .enter().append("g").selectAll("g")
             .data(chart.groupTicks);
@@ -49,7 +75,7 @@ window.Chord = d3.chart({
     this.layers.ticks.on("enter", function() {
       this.attr("transform", function(d) {
             return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
-                + "translate(" + outerRadius + ",0)";
+                + "translate(" + chart.radius().outer + ",0)";
           });
       this.append("line")
           .attr("x1", 1)
@@ -75,7 +101,7 @@ window.Chord = d3.chart({
       }
     });
     this.layers.chords.on("enter", function() {
-      this.attr("d", d3.svg.chord().radius(innerRadius))
+      this.attr("d", d3.svg.chord().radius(chart.radius().inner))
           .style("fill", function(d) { return fill(d.target.index); })
           .style("opacity", 1);
     });
