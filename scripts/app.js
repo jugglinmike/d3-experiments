@@ -51,5 +51,10 @@
 
   var myWackyChord = new WackyChord();
   myWackyChord.draw(matrix);
+  setInterval(function() {
+    myWackyChord.bc.data.shift();
+    myWackyChord.bc.data.push(myWackyChord.bc.next());
+    myWackyChord.draw();
+  }, 1500);
 
 }(this));
