@@ -2,23 +2,43 @@ window.WackyChord = d3.chart({
 
   mixins: {
     chord: window.Chord,
-    nsd: window.Barchart
+    bc: window.Barchart
   },
 
   initialize: function() {
     var colors = ["#000000", "#FFDD89", "#957244", "#F26223"];
+    var bc = this.bc;
+    var chord = this.chord;
+    var radius = 200;
 
-    console.log(this.base.node(), this.chord.base.node());
-    console.log(this.base.node() == this.chord.base.node());
-    this.chord.layers.ticks.on("enter", function() {
+    this.base.attr("width", this.chord.base.attr("width"));
+    this.base.attr("height", this.chord.base.attr("height"));
+
+    chord.setRadius(radius);
+    console.log(chord.radius());
+    chord.layers.ticks.on("enter", function() {
       this.each(function(data, idx, group) {
         d3.select(this).attr("fill", colors[group]);
       });
     });
 
-    this.nsd.layers.bars.on("enter", function() {
+    bc.base.attr("transform", "translate(480,130),rotate(180)");
+    bc.width(400);
+    bc.layers.bars.on("enter", function() {
+      this.attr("opacity", 0);
+    });
+    bc.layers.bars.on("enter:transition", function() {
+      this.duration(1000).attr("opacity", 1);
+    });
+    bc.layers.bars.on("exit:transition", function() {
+      this.attr("x", null);
+      this.attr("width", 0);
+    });
+    bc.layers.bars.on("update:transition", function() {
+      this.attr("x", null);
+      this.duration(1000).attr("opacity", 1);
       this.attr("transform", function(d, i) {
-        return "translate(300,-200)rotate(" +(i/33)*360+ ")";
+        return "rotate(" + (-360*i/bc.data.length) + ",0," + (-radius/1.65) + ")";
       });
     });
 
