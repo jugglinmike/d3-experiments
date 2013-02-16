@@ -1,11 +1,8 @@
 window.WackyBC = d3.chart({
 
-  mixins: {
-    barchart: window.Barchart
-  },
-
   initialize: function(options) {
 
+    this.mixin("barchart", new window.Barchart(options));
     this.base.attr("width", this.barchart.base.attr("width"));
     this.base.attr("height", this.barchart.base.attr("height"));
 

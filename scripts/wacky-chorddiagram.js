@@ -1,18 +1,19 @@
 window.WackyChord = d3.chart({
 
-  mixins: {
-    chord: window.Chord,
-    bc: window.Barchart
-  },
-
   initialize: function() {
     var colors = ["#000000", "#FFDD89", "#957244", "#F26223"];
-    var bc = this.bc;
-    var chord = this.chord;
+    var bc, chord;
     var radius = 200;
 
-    this.base.attr("width", this.chord.base.attr("width"));
-    this.base.attr("height", this.chord.base.attr("height"));
+    this.mixin({
+      chord: new window.Chord({ base: this.base.append("g") }),
+      bc: new window.Barchart({ base: this.base.append("g") })
+    });
+    bc = this.bc;
+    chord = this.chord;
+
+    this.base.attr("width", chord.base.attr("width"));
+    this.base.attr("height", chord.base.attr("height"));
 
     chord.setRadius(radius);
     console.log(chord.radius());
