@@ -1,6 +1,6 @@
 (function(window, undefined) {
 
-  var myBarChart = new Barchart();
+  var myBarChart = d3.select("body").chart("BarChart");
 
   myBarChart.draw();
   setInterval(function() {
@@ -9,7 +9,7 @@
     myBarChart.draw();
   }, 1500);
 
-  var myBarChart2 = new Barchart();
+  var myBarChart2 = d3.select("body").chart("BarChart");
 
   myBarChart2.layers.bars.on("update:transition", function() {
     this.attr("opacity", function(d, i) { return i/32; });
@@ -22,16 +22,16 @@
     myBarChart2.draw();
   }, 1500);
 
-  var myWackyBarChart = new WackyBC();
+  var myWackyBarChart = d3.select("body").chart("WackyBC");
 
   myWackyBarChart.draw();
   setInterval(function() {
-    myWackyBarChart.barchart.data.shift();
-    myWackyBarChart.barchart.data.push(myBarChart.next());
+    myWackyBarChart.BarChart.data.shift();
+    myWackyBarChart.BarChart.data.push(myBarChart.next());
     myWackyBarChart.draw();
   }, 1500);
 
-  var myChord = new Chord();
+  var myChord = d3.select("body").chart("Chord");
   // From http://mkweb.bcgsc.ca/circos/guide/tables/
   var matrix = [
     [11975,  5871, 8916, 2868],
@@ -42,18 +42,18 @@
 
   myChord.draw(matrix);
 
-  var myChord2 = new Chord();
+  var myChord2 = d3.select("body").chart("Chord");
 
   myChord2.layers.ticks.on("enter", function(entering) {
     entering.attr("fill", "#a00");
   });
   myChord2.draw(matrix);
 
-  var myWackyChord = new WackyChord();
+  var myWackyChord = d3.select("body").chart("WackyChord");
   myWackyChord.draw(matrix);
   setInterval(function() {
-    myWackyChord.bc.data.shift();
-    myWackyChord.bc.data.push(myWackyChord.bc.next());
+    myWackyChord.BarChart.data.shift();
+    myWackyChord.BarChart.data.push(myWackyChord.BarChart.next());
     myWackyChord.draw();
   }, 1500);
 

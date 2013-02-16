@@ -1,4 +1,4 @@
-window.Barchart = d3.chart({
+d3.chart("BarChart", {
 
   width: function(width) {
     if (!arguments.length) {

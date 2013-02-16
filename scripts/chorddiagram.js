@@ -1,4 +1,4 @@
-window.Chord = d3.chart({
+d3.chart("Chord", {
 
   width: function(width) {
     if (arguments.length === 0) {
