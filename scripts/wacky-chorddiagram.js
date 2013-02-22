@@ -5,18 +5,19 @@ d3.chart("WackyChord", {
     var bc, chord;
     var radius = 200;
 
-    this.mixin({
-      Chord: [{ base: this.base.append("g") }],
-      BarChart: [{ base: this.base.append("g") }]
-    });
-    bc = this.BarChart;
-    chord = this.Chord;
+    this.mixin("mchord", "Chord",
+      { base: this.base.append("g") }
+    );
+    this.mixin("bc", "BarChart",
+      { base: this.base.append("g") }
+    );
+    bc = this.bc;
+    chord = this.mchord;
 
     this.base.attr("width", chord.base.attr("width"));
     this.base.attr("height", chord.base.attr("height"));
 
     chord.setRadius(radius);
-    console.log(chord.radius());
     chord.layers.ticks.on("enter", function() {
       this.each(function(data, idx, group) {
         d3.select(this).attr("fill", colors[group]);

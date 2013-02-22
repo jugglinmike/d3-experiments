@@ -26,8 +26,8 @@
 
   myWackyBarChart.draw();
   setInterval(function() {
-    myWackyBarChart.BarChart.data.shift();
-    myWackyBarChart.BarChart.data.push(myBarChart.next());
+    myWackyBarChart.bc.data.shift();
+    myWackyBarChart.bc.data.push(myBarChart.next());
     myWackyBarChart.draw();
   }, 1500);
 
@@ -52,8 +52,8 @@
   var myWackyChord = d3.select("body").chart("WackyChord");
   myWackyChord.draw(matrix);
   setInterval(function() {
-    myWackyChord.BarChart.data.shift();
-    myWackyChord.BarChart.data.push(myWackyChord.BarChart.next());
+    myWackyChord.bc.data.shift();
+    myWackyChord.bc.data.push(myWackyChord.bc.next());
     myWackyChord.draw();
   }, 1500);
 
