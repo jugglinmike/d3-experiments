@@ -2,15 +2,10 @@ d3.chart("WackyChord", {
 
   initialize: function() {
     var colors = ["#000000", "#FFDD89", "#957244", "#F26223"];
-    var bc, chord;
     var radius = 200;
 
-    this.chord = chord = this.mixin("Chord",
-      { base: this.base.append("g") }
-    );
-    this.bc = bc = this.mixin("BarChart",
-      { base: this.base.append("g") }
-    );
+    var chord = this.chord = this.base.append("g").mixin("Chord");
+    var bc = this.bc = this.base.append("g").mixin("BarChart", { opt: 2 });
 
     this.base.attr("width", chord.base.attr("width"));
     this.base.attr("height", chord.base.attr("height"));
