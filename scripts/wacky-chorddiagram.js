@@ -4,8 +4,8 @@ d3.chart("WackyChord", {
     var colors = ["#000000", "#FFDD89", "#957244", "#F26223"];
     var radius = 200;
 
-    var chord = this.chord = this.base.append("g").mixin("Chord");
-    var bc = this.bc = this.base.append("g").mixin("BarChart", { opt: 2 });
+    var chord = this.chord = this.mixin(this.base.append("g"), "Chord");
+    var bc = this.bc = this.mixin(this.base.append("g"), "BarChart", { opt: 2 });
 
     this.base.attr("width", chord.base.attr("width"));
     this.base.attr("height", chord.base.attr("height"));
