@@ -5,14 +5,12 @@ d3.chart("WackyChord", {
     var bc, chord;
     var radius = 200;
 
-    this.mixin("mchord", "Chord",
+    this.chord = chord = this.mixin("Chord",
       { base: this.base.append("g") }
     );
-    this.mixin("bc", "BarChart",
+    this.bc = bc = this.mixin("BarChart",
       { base: this.base.append("g") }
     );
-    bc = this.bc;
-    chord = this.mchord;
 
     this.base.attr("width", chord.base.attr("width"));
     this.base.attr("height", chord.base.attr("height"));
