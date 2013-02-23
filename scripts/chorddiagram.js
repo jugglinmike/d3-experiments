@@ -5,6 +5,7 @@ d3.chart("Chord", {
       return this._w;
     }
     this._w = width;
+    this.base.attr("width", width);
     this.setRadius();
     return this;
   },
@@ -14,6 +15,7 @@ d3.chart("Chord", {
       return this._h;
     }
     this._h = height;
+    this.base.attr("height", height);
     this.setRadius();
     return this;
   },
@@ -33,19 +35,17 @@ d3.chart("Chord", {
     options = options || {};
 
     var chart = this;
-    this.width(options.width || 960);
+    this.width(options.width || 800);
     this.height(options.height || 500);
     this.setRadius();
+    var base = chart.base.append("g")
+        .attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
 
     var fill = d3.scale.ordinal()
         .domain(d3.range(4))
         .range(["#000000", "#FFDD89", "#957244", "#F26223"]);
 
-    this.base.attr("width", this.width())
-        .attr("height", this.height())
-        .attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
-
-    this.layers.handles = chart.base.append("g").layer({
+    this.layers.handles = base.append("g").layer({
       dataBind: function(chord) {
         return this.selectAll("path").data(chord.groups);
       },
@@ -61,7 +61,7 @@ d3.chart("Chord", {
           .on("mouseout", chart.fade(1));
     });
 
-    this.layers.ticks = this.base.append("g").layer({
+    this.layers.ticks = base.append("g").layer({
       dataBind: function(chord) {
         return this.selectAll("g")
             .data(chord.groups)
@@ -92,7 +92,7 @@ d3.chart("Chord", {
           .text(function(d) { return d.label; });
     });
 
-    this.layers.chords = chart.base.append("g").attr("class", "chord").layer({
+    this.layers.chords = base.append("g").attr("class", "chord").layer({
       dataBind: function(chord) {
         return this.selectAll("path").data(chord.chords);
       },

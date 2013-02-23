@@ -2,6 +2,6 @@
   fill: steelblue;
   stroke: white;
 }
-#crazy {
-  background-color: #a00;
+.wacky {
+  border: dashed 3px #a00;
 }
