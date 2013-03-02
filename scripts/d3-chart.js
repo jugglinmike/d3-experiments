@@ -4,11 +4,11 @@
 
   var d3 = window.d3;
 
-  var Dummy = function() {};
+  var Surrogate = function(ctor) { this.constructor = ctor; };
   var variadicNew = function(Ctor, args) {
     var inst;
-    Dummy.prototype = Ctor.prototype;
-    inst = new Dummy();
+    Surrogate.prototype = Ctor.prototype;
+    inst = new Surrogate(Ctor);
     Ctor.apply(inst, args);
     return inst;
   };
@@ -32,6 +32,17 @@
     return object;
   }
 
+  // initCascade
+  // Call the initialize method up the inheritance chain, starting with the
+  // base class and continuing "downward".
+  var initCascade = function(instance, args) {
+    var sup = this.constructor.__super__;
+    if (sup) {
+      initCascade.call(sup, instance, args);
+    }
+    this.initialize.apply(instance, args);
+  };
+
   var Chart = function(selection) {
 
     var mixin, mixinNs;
@@ -40,7 +51,7 @@
     this.layers = {};
     var mixins = this._mixins = [];
 
-    this.initialize.apply(this, Array.prototype.slice.call(arguments, 1));
+    initCascade.call(this, this, Array.prototype.slice.call(arguments, 1));
   };
 
   Chart.prototype.initialize = function() {};
@@ -74,8 +85,8 @@
     }
   };
 
-  d3.chart = function(name, protoProps, staticProps) {
-    var parent = Chart;
+  Chart.extend = function(name, protoProps, staticProps) {
+    var parent = this;
     var child;
 
     // The constructor function for the new subclass is either defined by you
@@ -106,6 +117,18 @@
 
     Chart[name] = child;
     return child;
+  };
+
+  // d3.chart
+  // A factory for creating chart constructors
+  d3.chart = function(name) {
+    if (arguments.length === 0) {
+      return Chart;
+    } else if (arguments.length === 1) {
+      return Chart[name];
+    }
+
+    return Chart.extend.apply(Chart, arguments);
   };
 
   d3.selection.prototype.chart = function(chartName) {

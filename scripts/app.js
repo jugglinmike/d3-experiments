@@ -25,12 +25,12 @@
   var myWackyBarChart = d3.select("body")
       .append("svg")
       .classed("wacky", true)
-      .chart("WackyBC");
+      .chart("FadingBarChart");
 
   myWackyBarChart.draw();
   setInterval(function() {
-    myWackyBarChart.bc.data.shift();
-    myWackyBarChart.bc.data.push(myBarChart.next());
+    myWackyBarChart.data.shift();
+    myWackyBarChart.data.push(myBarChart.next());
     myWackyBarChart.draw();
   }, 1500);
 

@@ -7,7 +7,7 @@ d3.chart("WackyChord", {
     var barWidth = radius * 2;
 
     var chord = this.chord = this.mixin(this.base.append("g"), "Chord");
-    var bc = this.bc = this.mixin(this.base.append("g"), "BarChart", { opt: 2 });
+    var bc = this.bc = this.mixin(this.base.append("g"), "FadingBarChart", { opt: 2 });
 
     this.base.attr("width", chord.base.attr("width"));
     this.base.attr("height", chord.base.attr("height"));
@@ -27,19 +27,12 @@ d3.chart("WackyChord", {
         "," +
         (this.base.attr("height")/2 + radius - barHeight) +
       ")");
-    bc.layers.bars.on("enter", function() {
-      this.attr("opacity", 0);
-    });
-    bc.layers.bars.on("enter:transition", function() {
-      this.duration(1000).attr("opacity", 1);
-    });
     bc.layers.bars.on("exit:transition", function() {
       this.attr("x", null);
       this.attr("width", 0);
     });
     bc.layers.bars.on("update:transition", function() {
       this.attr("x", null);
-      this.duration(1000).attr("opacity", 1);
       this.attr("transform", function(d, i) {
         return "rotate(" + (-360*i/bc.data.length) + ",0," + (barHeight-radius) + ")";
       });
