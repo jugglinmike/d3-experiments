@@ -30,7 +30,7 @@ var chart = d3.select("body").append("svg")
     .attr("class", "chart")
     .attr("width", w * data.length - 1)
     .attr("height", h);
-console.log(chart);
+
 function redraw() {
 
   var rect = chart.selectAll("rect")
@@ -48,6 +48,9 @@ function redraw() {
   rect.transition()
       .duration(300)
       .attr("x", function(d, i) { return x(i) - .5; });
+
+  // This breaks the chart, surprisingly
+  rect.transition();
 
   rect.exit().transition()
       .duration(300)
