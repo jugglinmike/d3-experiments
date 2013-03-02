@@ -21,8 +21,7 @@ d3.chart("BarChart", {
   },
 
   initialize: function(options) {
-    var svg,
-      chart = this,
+    var chart = this,
       t = 1297110663, // start time (seconds since epoch)
       v = 70, // start value (subscribers)
       data = d3.range(33).map(next); // starting dataset
@@ -44,7 +43,7 @@ d3.chart("BarChart", {
     this.width(options.width || 600);
     this.height(options.height || 80);
 
-    var svg = this.base
+    this.base
       .attr("class", "chart");
 
     function onEnter() {
@@ -83,7 +82,7 @@ d3.chart("BarChart", {
       return this.append("rect");
     }
 
-    this.layers.bars = svg.layer({
+    this.layers.bars = this.base.layer({
       dataBind: dataBind,
       insert: insert
     });
