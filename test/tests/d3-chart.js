@@ -135,14 +135,92 @@ suite("d3.chart", function() {
 			sinon.stub(mixin1, "draw");
 			sinon.stub(mixin2, "draw");
 		});
+		suite("accessor wrapping", function() {
+			setup(function() {
+				d3.chart("DataAttrTestChart", {
+					dataAttrs: ["attr1", "attr2", "attr3"]
+				});
+				this.myChart = d3.select("#test").chart("DataAttrTestChart");
+				this.myChart.transform = this.transform;
+			});
+
+			suite("attribute name declaration", function() {
+				test("allows access to attribute names declared in chart constructor", function(done) {
+
+					var chart = d3.select("#test").chart("DataAttrTestChart");
+					chart.transform = function(wrappedData) {
+						assert.doesNotThrow(function() {
+							wrappedData[0]("attr1");
+							wrappedData[0]("attr2");
+							wrappedData[0]("attr3");
+						});
+
+						done();
+					};
+					chart.draw([{}]);
+				});
+
+				test("disallows access to attribute names not declared in chart constructor", function(done) {
+					var chart = d3.select("#test").chart("DataAttrTestChart");
+
+					chart.transform = function(wrappedData) {
+						assert.throws(function() {
+							wrappedData[0]("attr4");
+						}, d3.chart.errors.UnsafeData);
+
+						done();
+					};
+
+					chart.draw([{}]);
+				});
+			});
+
+			test("wraps the data in accessors", function() {
+				var data = [1, 2, 3];
+				var wrappedData;
+				this.myChart.draw(data);
+
+				assert.equal(this.transform.callCount, 1);
+				wrappedData = this.transform.args[0][0];
+				assert.equal(wrappedData.length, 3);
+				assert.typeOf(wrappedData[0], "function");
+				assert.equal(wrappedData[0](), 1);
+				assert.typeOf(wrappedData[1], "function");
+				assert.equal(wrappedData[1](), 2);
+				assert.typeOf(wrappedData[2], "function");
+				assert.equal(wrappedData[2](), 3);
+			});
+
+			test("default accessors dereference data with specified attribute names", function() {
+				var data = [{
+					attr1: 1
+				}, {
+					attr2: 2
+				}, {
+					attr3: 3
+				}];
+				var wrappedData;
+				this.myChart.draw(data);
+
+				wrappedData = this.transform.args[0][0];
+				assert.equal(wrappedData[0]('attr1'), 1);
+				assert.equal(wrappedData[1]('attr2'), 2);
+				assert.equal(wrappedData[2]('attr3'), 3);
+			});
+		});
 		test("invokes the transform method once with the specified data", function() {
-			var data = {};
+			var data = [1, 2, 3];
+			var wrappedData;
 			assert.equal(this.transform.callCount, 0);
 
 			this.myChart.draw(data);
 
 			assert.equal(this.transform.callCount, 1);
-			assert.equal(this.transform.args[0][0], data);
+			wrappedData = this.transform.args[0][0];
+			assert.equal(wrappedData.length, 3);
+			assert.equal(wrappedData[0](), 1);
+			assert.equal(wrappedData[1](), 2);
+			assert.equal(wrappedData[2](), 3);
 		});
 		test("invokes the `draw` method of each of its layers", function() {
 			assert.equal(this.layer1.draw.callCount, 0);
@@ -154,7 +232,7 @@ suite("d3.chart", function() {
 			assert.equal(this.layer2.draw.callCount, 1);
 		});
 		test("invokes the `draw` method of each of its layers with the transformed data", function() {
-			this.myChart.draw({});
+			this.myChart.draw([]);
 
 			assert.equal(this.layer1.draw.args[0][0], this.transformedData);
 			assert.equal(this.layer2.draw.args[0][0], this.transformedData);
