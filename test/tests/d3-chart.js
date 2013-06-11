@@ -210,18 +210,18 @@ suite("d3.chart", function() {
 
 			test("uses custom accessors when specified", function(done) {
 				var chart = d3.select("#test").chart("DataAttrTestChart", {
-					getters: {
-						attr3: function(attr) {
-							return this.custom;
-						}
+					dataAttrs: {
+						attr1: "custom",
+						attr2: "deeply.nested"
 					}
 				});
 				chart.transform = function(data) {
-					assert.equal(data[0]('attr3'), 23);
+					assert.equal(data[0]('attr1'), 23);
+					assert.equal(data[0]('attr2'), 45);
 					done();
 				};
 
-				chart.draw([{ custom: 23 }]);
+				chart.draw([{ custom: 23, deeply: { nested: 45 } }]);
 			});
 		});
 		test("invokes the transform method once with the specified data", function() {

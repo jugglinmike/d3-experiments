@@ -65,7 +65,25 @@
 
 		initCascade.call(this, this, Array.prototype.slice.call(arguments, 1));
 
-		this._getters = chartOptions && chartOptions.getters || {};
+		var getters = this._getters = {};
+		var dataAttrs = chartOptions && chartOptions.dataAttrs;
+		if (dataAttrs) {
+			Object.keys(dataAttrs).forEach(function(attr) {
+				getters[attr] = makeGetter(dataAttrs[attr]);
+			});
+		}
+	};
+
+	function makeGetter(attr) {
+		var attrs = attr.split(".");
+		return function() {
+			var val = this;
+				console.log(val, attrs);
+			while (val = val[attrs.shift()]) {
+				if (!attrs.length) break;
+			}
+			return val;
+		};
 	};
 
 	Chart.prototype.unlayer = function(name) {
