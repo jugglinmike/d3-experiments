@@ -56,15 +56,16 @@
 		}
 	};
 
-	var Chart = function(selection) {
+	var Chart = function(selection, chartOptions) {
 
 		this.base = selection;
 		this._layers = {};
 		this._mixins = [];
 		this._events = {};
-		this._getters = {};
 
 		initCascade.call(this, this, Array.prototype.slice.call(arguments, 1));
+
+		this._getters = chartOptions && chartOptions.getters || {};
 	};
 
 	Chart.prototype.unlayer = function(name) {
@@ -93,10 +94,6 @@
 	};
 
 	Chart.prototype.initialize = function() {};
-
-	Chart.prototype.defineGetter = function(attr, getterFn) {
-		this._getters[attr] = getterFn;
-	};
 
 	Chart.prototype.transform = function(data) {
 		return data;

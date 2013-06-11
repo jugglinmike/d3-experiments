@@ -209,9 +209,12 @@ suite("d3.chart", function() {
 			});
 
 			test("uses custom accessors when specified", function(done) {
-				var chart = d3.select("#test").chart("DataAttrTestChart");
-				chart.defineGetter("attr3", function(attr) {
-					return this.custom;
+				var chart = d3.select("#test").chart("DataAttrTestChart", {
+					getters: {
+						attr3: function(attr) {
+							return this.custom;
+						}
+					}
 				});
 				chart.transform = function(data) {
 					assert.equal(data[0]('attr3'), 23);
