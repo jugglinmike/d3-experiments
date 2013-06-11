@@ -65,20 +65,40 @@
 
 		initCascade.call(this, this, Array.prototype.slice.call(arguments, 1));
 
-		var getters = this._getters = {};
+		var getters = {};
+		var dataProxy = this._dataProxy = {};
+		var vrtlAttrs = this.dataAttrs;
 		var dataAttrs = chartOptions && chartOptions.dataAttrs;
 		if (dataAttrs) {
 			Object.keys(dataAttrs).forEach(function(attr) {
 				getters[attr] = makeGetter(dataAttrs[attr]);
 			});
 		}
+		if (vrtlAttrs) {
+			vrtlAttrs.forEach(function(vrtlAttr) {
+				Object.defineProperty(dataProxy, vrtlAttr, {
+					get: function() {
+						var dataPoint = this._dataPoint;
+						var getter = getters[vrtlAttr];
+						if (getter) {
+							return getter.call(dataPoint, vrtlAttr);
+						} else {
+							return dataPoint[vrtlAttr];
+						}
+					}
+				});
+			});
+		}
+
 	};
 
 	function makeGetter(attr) {
+		if (typeof attr === 'function') {
+			return attr;
+		}
 		var attrs = attr.split(".");
 		return function() {
 			var val = this;
-				console.log(val, attrs);
 			while (val = val[attrs.shift()]) {
 				if (!attrs.length) break;
 			}
@@ -129,32 +149,14 @@
 
 	var wrapData = function(dataPoint) {
 		var dataAttrs = this.dataAttrs;
-		var getters = this._getters;
 
 		if (typeof dataPoint !== "object") {
 			return dataPoint;
 		}
-		var obj = {};
+		var dataProxy = Object.create(this._dataProxy);
+		dataProxy._dataPoint = dataPoint;
 
-		dataAttrs.forEach(function(attr) {
-			Object.defineProperty(obj, attr, {
-				get: function(__) {
-					console.log("M", arguments, this);
-					var getter;
-					if (dataAttrs && ~dataAttrs.indexOf(attr)) {
-						getter = getters[attr];
-						return getter ? getter.call(dataPoint, attr) : dataPoint[attr];
-					} else {
-						throw new errors.UnsafeData();
-					}
-				}
-			});
-		});
-
-		return obj;
-		return function(attr) {
-
-		};
+		return dataProxy;
 	};
 
 	Chart.prototype._doTranslate = true;

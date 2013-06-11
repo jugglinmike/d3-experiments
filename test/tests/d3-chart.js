@@ -196,7 +196,7 @@ suite("d3.chart", function() {
 			test("uses custom accessors when specified", function(done) {
 				var chart = d3.select("#test").chart("DataAttrTestChart", {
 					dataAttrs: {
-						attr1: "custom",
+						attr1: function() { return this.custom; },
 						attr2: "deeply.nested"
 					}
 				});
