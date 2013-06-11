@@ -148,9 +148,9 @@ suite("d3.chart", function() {
 					var chart = d3.select("#test").chart("DataAttrTestChart");
 					chart.transform = function(wrappedData) {
 						assert.doesNotThrow(function() {
-							wrappedData[0]("attr1");
-							wrappedData[0]("attr2");
-							wrappedData[0]("attr3");
+							wrappedData[0].attr1;
+							wrappedData[0].attr2;
+							wrappedData[0].attr3;
 						});
 
 						done();
@@ -163,7 +163,7 @@ suite("d3.chart", function() {
 
 					chart.transform = function(wrappedData) {
 						assert.throws(function() {
-							wrappedData[0]("attr4");
+							wrappedData[0].attr4;
 						}, d3.chart.errors.UnsafeData);
 
 						done();
@@ -171,21 +171,6 @@ suite("d3.chart", function() {
 
 					chart.draw([{}]);
 				});
-			});
-
-			test("wraps the data in accessors", function(done) {
-				var chart = d3.select("#test").chart("DataAttrTestChart");
-				var data = [1, 2, 3];
-				chart.transform = function(data) {
-					assert.equal(data.length, 3);
-					assert.typeOf(data[0], "function");
-					assert.typeOf(data[1], "function");
-					assert.typeOf(data[2], "function");
-
-					done();
-				};
-
-				chart.draw(data);
 			});
 
 			test("default accessors dereference data with specified attribute names", function(done) {
@@ -198,9 +183,9 @@ suite("d3.chart", function() {
 					attr3: 3
 				}];
 				chart.transform = function(data) {
-					assert.equal(data[0]('attr1'), 1);
-					assert.equal(data[1]('attr2'), 2);
-					assert.equal(data[2]('attr3'), 3);
+					assert.equal(data[0].attr1, 1);
+					assert.equal(data[1].attr2, 2);
+					assert.equal(data[2].attr3, 3);
 
 					done();
 				};
@@ -216,8 +201,8 @@ suite("d3.chart", function() {
 					}
 				});
 				chart.transform = function(data) {
-					assert.equal(data[0]('attr1'), 23);
-					assert.equal(data[0]('attr2'), 45);
+					assert.equal(data[0].attr1, 23);
+					assert.equal(data[0].attr2, 45);
 					done();
 				};
 

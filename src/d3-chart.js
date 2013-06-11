@@ -131,23 +131,43 @@
 		var dataAttrs = this.dataAttrs;
 		var getters = this._getters;
 
-		return function(attr) {
-			var getter;
+		if (typeof dataPoint !== "object") {
+			return dataPoint;
+		}
+		var obj = {};
 
-			if (dataAttrs && ~dataAttrs.indexOf(attr)) {
-				getter = getters[attr];
-				return getter ? getter.call(dataPoint, attr) : dataPoint[attr];
-			} else {
-				throw new errors.UnsafeData();
-			}
+		dataAttrs.forEach(function(attr) {
+			Object.defineProperty(obj, attr, {
+				get: function(__) {
+					console.log("M", arguments, this);
+					var getter;
+					if (dataAttrs && ~dataAttrs.indexOf(attr)) {
+						getter = getters[attr];
+						return getter ? getter.call(dataPoint, attr) : dataPoint[attr];
+					} else {
+						throw new errors.UnsafeData();
+					}
+				}
+			});
+		});
+
+		return obj;
+		return function(attr) {
+
 		};
+	};
+
+	Chart.prototype._doTranslate = true;
+
+	Chart.prototype.translate = function(doTranslate) {
+		this._doTranslate = !!doTranslate;
 	};
 
 	Chart.prototype.draw = function(data) {
 
 		var layerName, mixinName, wrappedData;
 
-		if (data) {
+		if (data && this._doTranslate) {
 			wrappedData = data.map(wrapData.bind(this));
 			wrappedData.raw = data;
 		}
