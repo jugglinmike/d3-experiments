@@ -45,8 +45,6 @@
 		if (Object.hasOwnProperty.call(this.constructor.prototype, "initialize")) {
 			this.initialize.apply(instance, args);
 		}
-
-		instance._dataAttrs.push.apply(instance._dataAttrs, this.dataAttrs);
 	};
 
 	// wrapData
@@ -71,12 +69,10 @@
 		this._layers = {};
 		this._mixins = [];
 		this._events = {};
-		this._dataAttrs = [];
 
 		initCascade.call(this, this, Array.prototype.slice.call(arguments, 1));
 
 		var getters = {};
-		var dataAttrs = this._dataAttrs;
 		var dataMapping = chartOptions && chartOptions.dataMapping;
 		var dataProxy = this._dataProxy = {};
 
@@ -86,7 +82,7 @@
 			});
 		}
 
-		dataAttrs.forEach(function(attr) {
+		this.dataAttrs.forEach(function(attr) {
 			var customGetter = getters[attr];
 			var getter;
 
@@ -242,7 +238,7 @@
 
 	Chart.extend = function(name, protoProps, staticProps) {
 		var parent = this;
-		var child;
+		var child, dataAttrs;
 
 		// The constructor function for the new subclass is either defined by
 		// you (the "constructor" property in your `extend` definition), or
@@ -269,6 +265,13 @@
 		// Set a convenience property in case the parent's prototype is needed
 		// later.
 		child.__super__ = parent.prototype;
+
+		// Inherit chart data attributes. This allows charts that derive from
+		// other charts to use the same attributes for data without
+		// compromising their ability to add additional attributes.
+		dataAttrs = child.prototype.dataAttrs || [];
+		dataAttrs.push.apply(dataAttrs, parent.prototype.dataAttrs);
+		child.prototype.dataAttrs = dataAttrs;
 
 		Chart[name] = child;
 		return child;
