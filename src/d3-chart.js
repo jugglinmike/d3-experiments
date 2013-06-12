@@ -51,8 +51,6 @@
 	// Given a data point, return an object with customized accessors for each
 	// of the chart's data attributes.
 	var wrapData = function(dataPoint) {
-		var dataAttrs = this.vrtlAttrs;
-
 		if (typeof dataPoint !== "object") {
 			return dataPoint;
 		}
