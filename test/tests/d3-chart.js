@@ -147,29 +147,25 @@ suite("d3.chart", function() {
 				test("allows access to attribute names declared in chart constructor", function(done) {
 					var chart = d3.select("#test").chart("DataAttrTestChart");
 					chart.transform = function(wrappedData) {
-						assert.doesNotThrow(function() {
-							wrappedData[0].attr1;
-							wrappedData[0].attr2;
-							wrappedData[0].attr3;
-						});
+						assert.ok(wrappedData[0].attr1);
+						assert.ok(wrappedData[0].attr2);
+						assert.ok(wrappedData[0].attr3);
 
 						done();
 					};
-					chart.draw([{}]);
+					chart.draw([{ attr1: 1, attr2: 2, attr3: 3 }]);
 				});
 
-				test("disallows access to attribute names not declared in chart constructor", function(done) {
+				test("restricts access to attribute names declared in chart constructor", function(done) {
 					var chart = d3.select("#test").chart("DataAttrTestChart");
 
 					chart.transform = function(wrappedData) {
-						assert.throws(function() {
-							wrappedData[0].attr4;
-						}, d3.chart.errors.UnsafeData);
+						assert.isUndefined(wrappedData[0].attr4);
 
 						done();
 					};
 
-					chart.draw([{}]);
+					chart.draw([{ attr4: 23 }]);
 				});
 			});
 
