@@ -73,18 +73,18 @@
 		initCascade.call(this, this, Array.prototype.slice.call(arguments, 1));
 
 		var getters = {};
-		var vrtlAttrs = this.vrtlAttrs || [];
-		var dataAttrs = chartOptions && chartOptions.dataAttrs;
+		var dataAttrs = this.dataAttrs || [];
+		var dataMapping = chartOptions && chartOptions.dataMapping;
 		var dataProxy = this._dataProxy = {};
 
-		if (dataAttrs) {
-			Object.keys(dataAttrs).forEach(function(vrtlAttr) {
-				getters[vrtlAttr] = dataAttrs[vrtlAttr];
+		if (dataMapping) {
+			Object.keys(dataMapping).forEach(function(attr) {
+				getters[attr] = dataMapping[attr];
 			});
 		}
 
-		vrtlAttrs.forEach(function(vrtlAttr) {
-			var customGetter = getters[vrtlAttr];
+		dataAttrs.forEach(function(attr) {
+			var customGetter = getters[attr];
 			var getter;
 
 			if (customGetter) {
@@ -93,11 +93,11 @@
 				};
 			} else {
 				getter = function() {
-					return this._dataPoint[vrtlAttr];
+					return this._dataPoint[attr];
 				};
 			}
 
-			Object.defineProperty(dataProxy, vrtlAttr, {
+			Object.defineProperty(dataProxy, attr, {
 				get: getter
 			});
 		}, this);

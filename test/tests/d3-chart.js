@@ -138,7 +138,7 @@ suite("d3.chart", function() {
 		suite("data accessor wrapping", function() {
 			suiteSetup(function() {
 				d3.chart("DataAttrTestChart", {
-					vrtlAttrs: ["attr1", "attr2", "attr3"]
+					dataAttrs: ["attr1", "attr2", "attr3"]
 				});
 				this.myChart.transform = this.transform;
 			});
@@ -191,7 +191,7 @@ suite("d3.chart", function() {
 
 			test("uses custom accessors when specified", function(done) {
 				var chart = d3.select("#test").chart("DataAttrTestChart", {
-					dataAttrs: {
+					dataMapping: {
 						attr1: function() { return this.custom; },
 						attr2: function() { return this.deeply.nested; }
 					}
