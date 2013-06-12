@@ -45,6 +45,8 @@
 		if (Object.hasOwnProperty.call(this.constructor.prototype, "initialize")) {
 			this.initialize.apply(instance, args);
 		}
+
+		instance._dataAttrs.push.apply(instance._dataAttrs, this.dataAttrs);
 	};
 
 	// wrapData
@@ -69,11 +71,12 @@
 		this._layers = {};
 		this._mixins = [];
 		this._events = {};
+		this._dataAttrs = [];
 
 		initCascade.call(this, this, Array.prototype.slice.call(arguments, 1));
 
 		var getters = {};
-		var dataAttrs = this.dataAttrs || [];
+		var dataAttrs = this._dataAttrs;
 		var dataMapping = chartOptions && chartOptions.dataMapping;
 		var dataProxy = this._dataProxy = {};
 

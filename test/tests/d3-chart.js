@@ -135,7 +135,8 @@ suite("d3.chart", function() {
 			sinon.stub(mixin1, "draw");
 			sinon.stub(mixin2, "draw");
 		});
-		suite("data accessor wrapping", function() {
+
+		suite("data accessors", function() {
 			suiteSetup(function() {
 				d3.chart("DataAttrTestChart", {
 					dataAttrs: ["attr1", "attr2", "attr3"]
@@ -144,7 +145,7 @@ suite("d3.chart", function() {
 			});
 
 			suite("attribute name declaration", function() {
-				test("allows access to attribute names declared in chart constructor", function(done) {
+				test("attribute names declared in chart constructor are accessible", function(done) {
 					var chart = d3.select("#test").chart("DataAttrTestChart");
 					chart.transform = function(wrappedData) {
 						assert.ok(wrappedData[0].attr1);
@@ -156,7 +157,7 @@ suite("d3.chart", function() {
 					chart.draw([{ attr1: 1, attr2: 2, attr3: 3 }]);
 				});
 
-				test("restricts access to attribute names declared in chart constructor", function(done) {
+				test("attribute names not declared in chart constructor are inaccessible", function(done) {
 					var chart = d3.select("#test").chart("DataAttrTestChart");
 
 					chart.transform = function(wrappedData) {
@@ -167,44 +168,69 @@ suite("d3.chart", function() {
 
 					chart.draw([{ attr4: 23 }]);
 				});
-			});
 
-			test("default accessors dereference data with specified attribute names", function(done) {
-				var chart = d3.select("#test").chart("DataAttrTestChart");
-				var data = [{
-					attr1: 1
-				}, {
-					attr2: 2
-				}, {
-					attr3: 3
-				}];
-				chart.transform = function(data) {
-					assert.equal(data[0].attr1, 1);
-					assert.equal(data[1].attr2, 2);
-					assert.equal(data[2].attr3, 3);
+				test("names are properly inherited", function(done) {
+					d3.chart("DataAttrTestChart")
+						.extend("ExtendedDataAttrTestChart", {
+							dataAttrs: ["attr4"]
+						});
 
-					done();
-				};
+					var chart = d3.select("#test")
+						.chart("ExtendedDataAttrTestChart");
+					chart.transform = function(wrappedData) {
+						assert.ok(wrappedData[0].attr1);
+						assert.ok(wrappedData[0].attr2);
+						assert.ok(wrappedData[0].attr3);
+						assert.ok(wrappedData[0].attr4);
 
-				chart.draw(data);
-			});
+						done();
+					};
 
-			test("uses custom accessors when specified", function(done) {
-				var chart = d3.select("#test").chart("DataAttrTestChart", {
-					dataMapping: {
-						attr1: function() { return this.custom; },
-						attr2: function() { return this.deeply.nested; }
-					}
+					chart.draw([{ attr1: 1, attr2: 2, attr3: 3, attr4: 4 }]);
 				});
-				chart.transform = function(data) {
-					assert.equal(data[0].attr1, 23);
-					assert.equal(data[0].attr2, 45);
-					done();
-				};
 
-				chart.draw([{ custom: 23, deeply: { nested: 45 } }]);
+
+			});
+
+			suite("mapping", function() {
+				test("default accessors dereference data with specified attribute names", function(done) {
+					var chart = d3.select("#test").chart("DataAttrTestChart");
+					var data = [{
+						attr1: 1
+					}, {
+						attr2: 2
+					}, {
+						attr3: 3
+					}];
+					chart.transform = function(data) {
+						assert.equal(data[0].attr1, 1);
+						assert.equal(data[1].attr2, 2);
+						assert.equal(data[2].attr3, 3);
+
+						done();
+					};
+
+					chart.draw(data);
+				});
+
+				test("uses custom accessors when specified", function(done) {
+					var chart = d3.select("#test").chart("DataAttrTestChart", {
+						dataMapping: {
+							attr1: function() { return this.custom; },
+							attr2: function() { return this.deeply.nested; }
+						}
+					});
+					chart.transform = function(data) {
+						assert.equal(data[0].attr1, 23);
+						assert.equal(data[0].attr2, 45);
+						done();
+					};
+
+					chart.draw([{ custom: 23, deeply: { nested: 45 } }]);
+				});
 			});
 		});
+
 		test("invokes the transform method once with the specified data", function() {
 			var data = [1, 2, 3];
 			var wrappedData;
