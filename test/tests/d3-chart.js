@@ -193,6 +193,24 @@ suite("d3.chart", function() {
 			});
 
 			suite("mapping", function() {
+				test("primitive data points pass through unmodified", function(done) {
+					d3.chart("SimpleDataAttrTestChart", {});
+					var chart = d3.select("#test")
+						.chart("SimpleDataAttrTestChart");
+					var obj = {};
+					var data = [1, "a string", false, obj];
+					chart.transform = function(data) {
+						assert.equal(data[0], 1);
+						assert.equal(data[1], "a string");
+						assert.equal(data[2], false);
+						assert.notEqual(data[3], obj);
+
+						done();
+					};
+
+					chart.draw(data);
+				});
+
 				test("default accessors dereference data with specified attribute names", function(done) {
 					var chart = d3.select("#test").chart("DataAttrTestChart");
 					var data = [{
