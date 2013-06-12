@@ -193,7 +193,7 @@ suite("d3.chart", function() {
 				var chart = d3.select("#test").chart("DataAttrTestChart", {
 					dataAttrs: {
 						attr1: function() { return this.custom; },
-						attr2: "deeply.nested"
+						attr2: function() { return this.deeply.nested; }
 					}
 				});
 				chart.transform = function(data) {
