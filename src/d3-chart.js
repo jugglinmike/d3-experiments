@@ -56,6 +56,22 @@
 		}
 	};
 
+	// wrapData
+	// Given a data point, return an object with customized accessors for each
+	// of the chart's data attributes.
+	var wrapData = function(dataPoint) {
+		var dataAttrs = this.dataAttrs;
+
+		if (typeof dataPoint !== "object") {
+			return dataPoint;
+		}
+		var dataProxy = Object.create(this._dataProxy);
+		dataProxy._dataPoint = dataPoint;
+
+		return dataProxy;
+	};
+
+
 	var Chart = function(selection, chartOptions) {
 
 		this.base = selection;
@@ -66,30 +82,34 @@
 		initCascade.call(this, this, Array.prototype.slice.call(arguments, 1));
 
 		var getters = {};
-		var dataProxy = this._dataProxy = {};
-		var vrtlAttrs = this.dataAttrs;
+		var vrtlAttrs = this.dataAttrs || [];
 		var dataAttrs = chartOptions && chartOptions.dataAttrs;
+		var dataProxy = this._dataProxy = {};
 
-		if (vrtlAttrs) {
-			vrtlAttrs.forEach(function(vrtlAttr) {
-				Object.defineProperty(dataProxy, vrtlAttr, {
-					get: function() {
-						var dataPoint = this._dataPoint;
-						var getter = getters[vrtlAttr];
-						if (getter) {
-							return getter.call(dataPoint, vrtlAttr);
-						} else {
-							return dataPoint[vrtlAttr];
-						}
-					}
-				});
+		if (dataAttrs) {
+			Object.keys(dataAttrs).forEach(function(vrtlAttr) {
+				getters[vrtlAttr] = dataAttrs[vrtlAttr];
 			});
-			if (dataAttrs) {
-				Object.keys(dataAttrs).forEach(function(attr) {
-					getters[attr] = dataAttrs[attr];
-				});
-			}
 		}
+
+		vrtlAttrs.forEach(function(vrtlAttr) {
+			var customGetter = getters[vrtlAttr];
+			var getter;
+
+			if (customGetter) {
+				getter = function() {
+					return customGetter.call(this._dataPoint);
+				};
+			} else {
+				getter = function() {
+					return this._dataPoint[vrtlAttr];
+				};
+			}
+
+			Object.defineProperty(dataProxy, vrtlAttr, {
+				get: getter
+			});
+		}, this);
 
 	};
 
@@ -134,33 +154,15 @@
 		return chart;
 	};
 
-	var wrapData = function(dataPoint) {
-		var dataAttrs = this.dataAttrs;
-
-		if (typeof dataPoint !== "object") {
-			return dataPoint;
-		}
-		var dataProxy = Object.create(this._dataProxy);
-		dataProxy._dataPoint = dataPoint;
-
-		return dataProxy;
-	};
-
-	Chart.prototype._doTranslate = true;
-
-	Chart.prototype.translate = function(doTranslate) {
-		this._doTranslate = !!doTranslate;
-	};
-
 	Chart.prototype.draw = function(data) {
 
 		var layerName, mixinName, wrappedData;
 
-		if (data && this._doTranslate) {
+		if (data) {
 			wrappedData = data.map(wrapData.bind(this));
-			wrappedData.raw = data;
+			data = wrappedData;
 		}
-		data = this.transform(wrappedData);
+		data = this.transform(data);
 
 		for (layerName in this._layers) {
 			this._layers[layerName].draw(data);
