@@ -51,7 +51,7 @@
 	// Given a data point, return an object with customized accessors for each
 	// of the chart's data attributes.
 	var wrapData = function(dataPoint) {
-		var dataAttrs = this.dataAttrs;
+		var dataAttrs = this.vrtlAttrs;
 
 		if (typeof dataPoint !== "object") {
 			return dataPoint;
@@ -73,7 +73,7 @@
 		initCascade.call(this, this, Array.prototype.slice.call(arguments, 1));
 
 		var getters = {};
-		var vrtlAttrs = this.dataAttrs || [];
+		var vrtlAttrs = this.vrtlAttrs || [];
 		var dataAttrs = chartOptions && chartOptions.dataAttrs;
 		var dataProxy = this._dataProxy = {};
 

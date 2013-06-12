@@ -138,7 +138,7 @@ suite("d3.chart", function() {
 		suite("data accessor wrapping", function() {
 			suiteSetup(function() {
 				d3.chart("DataAttrTestChart", {
-					dataAttrs: ["attr1", "attr2", "attr3"]
+					vrtlAttrs: ["attr1", "attr2", "attr3"]
 				});
 				this.myChart.transform = this.transform;
 			});
