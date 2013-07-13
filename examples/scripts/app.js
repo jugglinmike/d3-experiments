@@ -16,7 +16,7 @@
 
   var dataSrc = new DataSrc();
   var myBarChart = d3.select("body")
-    .append("svg").chart("BarChart");
+    .append("svg").chart("BarChart", { dataMapping: false });
   myBarChart.draw(dataSrc);
   setInterval(function() {
     dataSrc.fetch();
@@ -25,7 +25,7 @@
 
   var dataSrc2 = new DataSrc();
   var myCustomBarChart = d3.select("body")
-    .append("svg").chart("BarChart");
+    .append("svg").chart("BarChart", { dataMapping: false });
   var fadeOut = function() {
     this.attr("opacity", function(d, i) {
       return i / dataSrc2.data.length;
@@ -41,7 +41,7 @@
 
   var dataSrc3 = new DataSrc();
   var myFadingBarChart = d3.select("body")
-    .append("svg").chart("FadingBarChart");
+    .append("svg").chart("FadingBarChart", { dataMapping: false });
   myFadingBarChart.draw(dataSrc3);
   setInterval(function() {
     dataSrc3.fetch();
@@ -49,12 +49,12 @@
   }, 1500);
 
   var myChord = d3.select("body")
-    .append("svg").chart("Chord");
+    .append("svg").chart("Chord", { dataMapping: false });
   myChord.draw(matrix);
 
   var colors = ["#000000", "#FFDD89", "#957244", "#F26224"];
   var myCustomChord = d3.select("body")
-    .append("svg").chart("Chord");
+    .append("svg").chart("Chord", { dataMapping: false });
   myCustomChord.layer("ticks").on("enter", function() {
     this.each(function(data, idx, group) {
       d3.select(this)
@@ -65,7 +65,7 @@
   myCustomChord.draw(matrix);
 
   var myImprovedChord = d3.select("body")
-    .append("svg").chart("ImprovedChord");
+    .append("svg").chart("ImprovedChord", { dataMapping: false });
   myImprovedChord.draw(matrix);
 
   var dataSrc4 = new DataSrc();

@@ -1,11 +1,13 @@
 d3.chart("Hybrid", {
 
+  dataAttrs: ["series1", "series2"],
+
   initialize: function() {
     var barHeight = this.barHeight();
     var barWidth = this.radius * 2;
 
-    var chord = this.chord = this.mixin("ImprovedChord", this.base.append("g"));
-    var bc = this.bc = this.mixin("FadingBarChart", this.base.append("g"));
+    var chord = this.chord = this.mixin("ImprovedChord", this.base.append("g"), { dataMapping: false });
+    var bc = this.bc = this.mixin("FadingBarChart", this.base.append("g"), { dataMapping: false });
     chord.transform = function(data) {
       return d3.chart("Chord").prototype.transform(data.series2);
     };

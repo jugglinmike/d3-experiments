@@ -1,5 +1,7 @@
 d3.chart("BarChart", {
 
+  dataAttrs: ['value'],
+
   initialize: function(options) {
 
     options = options || {};
