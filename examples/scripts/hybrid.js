@@ -1,5 +1,7 @@
 d3.chart("Hybrid", {
 
+  dataAttrs: ['series1', 'series2'],
+
   initialize: function() {
     var barHeight = this.barHeight();
     var barWidth = this.radius * 2;
@@ -7,10 +9,10 @@ d3.chart("Hybrid", {
     var chord = this.chord = this.mixin("ImprovedChord", this.base.append("g"));
     var bc = this.bc = this.mixin("FadingBarChart", this.base.append("g"));
     chord.transform = function(data) {
-      return d3.chart("Chord").prototype.transform(data.series2);
+      return data.series2;
     };
     bc.transform = function(data) {
-      return d3.chart("BarChart").prototype.transform.call(bc, data.series1);
+      return data.series1;
     };
 
     this.base.attr("width", chord.base.attr("width"));
